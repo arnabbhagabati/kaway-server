@@ -1,4 +1,4 @@
-package com.example.helloworld;
+package com.example.kaway;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -48,6 +48,11 @@ class HelloController {
   @GetMapping("/")
   String hello() {
     return "Hello World!";
+  }
+
+  @GetMapping("/default")
+  String getDefaultdata() {
+    return "Hello Arnab";
   }
 
 }
