@@ -1,6 +1,6 @@
 FROM adoptopenjdk:11-jre-hotspot
 
-chmod +x mvnw &&
+chmod +x mvnw
 
 COPY target/helloworld.jar /helloworld.jar
 
