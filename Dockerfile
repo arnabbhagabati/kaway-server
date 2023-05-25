@@ -1,7 +1,7 @@
 FROM adoptopenjdk:11-jre-hotspot
 
-chmod +x mvnw
+chmod +x mvnw &&
 
-COPY target/helloworld.jar /helloworld.jar
+COPY target/kaway-server.jar /kaway-server.jar
 
-ENTRYPOINT java -jar helloworld.jar
+ENTRYPOINT java -jar kaway-server.jar

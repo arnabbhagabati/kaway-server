@@ -1,5 +1,5 @@
 {
-    "name": "helloworld",
+    "name": "kaway-server",
     "build": {
         "buildpacks": {
             "builder": "gcr.io/buildpacks/builder:v1"

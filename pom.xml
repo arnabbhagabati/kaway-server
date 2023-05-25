@@ -8,8 +8,8 @@
 		<version>2.3.1.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>helloworld-springboot-tomcat</artifactId>
+	<groupId>com.kaway</groupId>
+	<artifactId>kaway-springboot-tomcat</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
@@ -48,7 +48,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>helloworld</finalName>
+		<finalName>kaway-server</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

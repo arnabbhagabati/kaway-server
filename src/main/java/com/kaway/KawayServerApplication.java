@@ -1,4 +1,4 @@
-package com.example.kaway;
+package com.kaway;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-public class HelloworldApplication {
+public class KawayServerApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(HelloworldApplication.class, args);
+    SpringApplication.run(KawayServerApplication.class, args);
   }
 }
 
@@ -43,16 +43,16 @@ class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyE
 }
 
 @RestController
-class HelloController {
+class KawayController {
 
   @GetMapping("/")
   String hello() {
-    return "Hello World!";
+    return "Hello magga!";
   }
 
   @GetMapping("/default")
   String getDefaultdata() {
-    return "Hello Arnab";
+    return "Hello Arnabii";
   }
 
 }
