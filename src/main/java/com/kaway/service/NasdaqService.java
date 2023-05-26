@@ -5,8 +5,13 @@ import com.kaway.beans.NasdaqHistDataPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class NasdaqService {
@@ -52,7 +57,22 @@ public class NasdaqService {
             op.add(dp);
         }
 
-        return op;
+        List<NasdaqHistDataPoint> op1 = op.stream().sorted(new Comparator<NasdaqHistDataPoint>() {
+            @Override
+            public int compare(NasdaqHistDataPoint o1, NasdaqHistDataPoint o2) {
+                try {
+                    Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(o1.getTime());
+                    Date date2 = new SimpleDateFormat("yyyy-MM-dd").parse(o2.getTime());
+
+                    return date1.compareTo(date2);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return 0;
+            }
+        }).collect(Collectors.toList());
+
+        return op1;
 
     }
 }

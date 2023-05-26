@@ -56,7 +56,7 @@ class KawayController {
   List<NasdaqHistDataPoint> getDefaultdata() {
 
     //NasdaqService service = new NasdaqService();
-    return nasdaqService.getHistData("BSE","BOM533171");
+    return nasdaqService.getHistData("BSE","BOM500547");
   }
 
 }
