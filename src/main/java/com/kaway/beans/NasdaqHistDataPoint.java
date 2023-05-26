@@ -1,18 +1,14 @@
 package com.kaway.beans;
 
-import org.springframework.stereotype.Component;
-
-import java.util.Date;
-
 
 public class NasdaqHistDataPoint {
     private String date;
-    private float closeAmt;
+    private float data;
 
-    public NasdaqHistDataPoint(String date,float closeAmt){
+    public NasdaqHistDataPoint(String date,float data){
         //Date dt = new Date(date);
         this.date =date;
-        this.closeAmt =closeAmt;
+        this.data = data;
     }
 
     public String getDate() {
@@ -23,11 +19,11 @@ public class NasdaqHistDataPoint {
         this.date = date;
     }
 
-    public float getCloseAmt() {
-        return closeAmt;
+    public float getData() {
+        return data;
     }
 
-    public void setCloseAmt(float closeAmt) {
-        this.closeAmt = closeAmt;
+    public void setData(float data) {
+        this.data = data;
     }
 }
