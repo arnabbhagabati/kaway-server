@@ -1,6 +1,8 @@
 package com.kaway.main;
 
+import com.google.cloud.firestore.CollectionReference;
 import com.kaway.beans.NasdaqHistDataPoint;
+import com.kaway.db.BaseDAO;
 import com.kaway.service.NasdaqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +18,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @Component
 @Order(0)
@@ -47,16 +55,29 @@ class KawayController {
   @Autowired
   NasdaqService nasdaqService;
 
+  @Autowired
+  BaseDAO baseDao;
+
   @GetMapping("/")
   String hello() {
     return "Hello magga!";
   }
 
   @GetMapping("/default")
-  List<NasdaqHistDataPoint> getDefaultdata() {
-
+  List<NasdaqHistDataPoint> getDefaultdata() throws IOException, ExecutionException, InterruptedException {
     //NasdaqService service = new NasdaqService();
-    return nasdaqService.getHistData("BSE","BOM500547");
+    Map<String, Object> data = baseDao.getDailySecData("BSE","BOM500104");
+    List<NasdaqHistDataPoint> freshdata = null;
+    String today = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+    if(data == null ){
+      freshdata = nasdaqService.getHistData("BSE","BOM500104");
+      Map<String,List<NasdaqHistDataPoint>> dbData = new HashMap<>();
+      dbData.put(today,freshdata);
+      baseDao.setDailySecData("BSE","BOM500104",dbData);
+    }else{
+      freshdata = (List<NasdaqHistDataPoint>) data.get(today);
+    }
+    return freshdata;
   }
 
 }
