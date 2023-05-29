@@ -1,21 +1,18 @@
 package com.kaway.main;
 
-import com.google.cloud.firestore.CollectionReference;
+
 import com.kaway.beans.NasdaqHistDataPoint;
 import com.kaway.db.BaseDAO;
 import com.kaway.service.NasdaqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -25,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import static com.kaway.main.KawayConstants.*;
 
 @Component
 @Order(0)
@@ -63,17 +62,18 @@ class KawayController {
     return "Hello magga!";
   }
 
-  @GetMapping("/default")
-  List<NasdaqHistDataPoint> getDefaultdata() throws IOException, ExecutionException, InterruptedException {
+  @GetMapping("/histData/{exchange}/{secId}")
+  List<NasdaqHistDataPoint> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId,@RequestParam(name = "stDate") String startDate, @RequestParam String endDate) throws IOException, ExecutionException, InterruptedException {
     //NasdaqService service = new NasdaqService();
-    Map<String, Object> data = baseDao.getDailySecData("BSE","BOM500104");
+    System.out.println("exchange="+exchange+" secId="+secId+" stDate ="+startDate+"  endDate="+endDate);
+    Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
     List<NasdaqHistDataPoint> freshdata = null;
-    String today = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-    if(data == null ){
-      freshdata = nasdaqService.getHistData("BSE","BOM500104");
+    String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
+    if(data==null || !data.containsKey(today)){
+      freshdata = nasdaqService.getHistData(exchange,secId);
       Map<String,List<NasdaqHistDataPoint>> dbData = new HashMap<>();
       dbData.put(today,freshdata);
-      baseDao.setDailySecData("BSE","BOM500104",dbData);
+      baseDao.setDailySecData(exchange,secId,dbData);
     }else{
       freshdata = (List<NasdaqHistDataPoint>) data.get(today);
     }
