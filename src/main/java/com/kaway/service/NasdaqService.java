@@ -20,22 +20,27 @@ public class NasdaqService {
     HTTPClient client;
 
     private static String NASDAQ_HIST_DATA_BASE = "https://data.nasdaq.com/api/v3/datasets/";
+    private static int GAP_BETWEEN_CALLS = 5000;
+    private static long LAST_CALL_TIME = System.currentTimeMillis();
 
     //Todo : move this to more secure loc
     private static String API_KEY = "-oTncyawbkcCWCAn_Jqx";
 
-    public List<NasdaqHistDataPoint> getHistData(String exchngCode,String stockCode){
+    public List<NasdaqHistDataPoint> getHistData(String exchngCode,String stockCode) throws InterruptedException {
+
+        if((System.currentTimeMillis() - LAST_CALL_TIME) < GAP_BETWEEN_CALLS){
+            System.out.println("Too frequent calls time is "+System.currentTimeMillis()+" LAST_CALL_TIME "+LAST_CALL_TIME);
+            Thread.sleep(GAP_BETWEEN_CALLS);
+        }
+        LAST_CALL_TIME = System.currentTimeMillis();
+        System.out.println("LAST call time is "+LAST_CALL_TIME);
+
         String url =NASDAQ_HIST_DATA_BASE+"/"+exchngCode+"/"+stockCode+".json?API_KEY="+API_KEY;
         String rawdata = client.getHTTPData(url);
 
         List<NasdaqHistDataPoint> op = new ArrayList<>();
 
-
         Gson g = new Gson();
-
-        // De-serialize to an object
-        //Person person = g.fromJson("{\"name\": \"John\"}", Person.class);
-        //System.out.println(person.name); //John
 
         // Read a single attribute
         JsonObject rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("dataset");
