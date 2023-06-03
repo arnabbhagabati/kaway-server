@@ -1,11 +1,13 @@
 package com.kaway.service;
 
 import com.google.gson.*;
+import com.kaway.beans.BSEHistDataPoint;
 import com.kaway.beans.DataPoint;
 import com.kaway.beans.NasdaqHistDataPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.security.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,13 +16,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.kaway.main.KawayConstants.*;
+
 @Component
-public class NasdaqService {
+public class NSEDataService {
 
     @Autowired
     HTTPClient client;
 
-    private static String NASDAQ_HIST_DATA_BASE = "https://data.nasdaq.com/api/v3/datasets/";
+    private static String NSE_HIST_DATA_BASE = "https://query2.finance.yahoo.com/v8/finance/chart/";
     private static int GAP_BETWEEN_CALLS = 5000;
     private static long LAST_CALL_TIME = System.currentTimeMillis();
 
@@ -35,9 +39,9 @@ public class NasdaqService {
             Thread.sleep(GAP_BETWEEN_CALLS);
         }
         LAST_CALL_TIME = System.currentTimeMillis();
-        System.out.println("Calling  "+NASDAQ_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
+        System.out.println("Calling  "+NSE_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
-        String url =NASDAQ_HIST_DATA_BASE+"/"+exchngCode+"/"+stockCode+".json?API_KEY="+API_KEY;
+        String url =NSE_HIST_DATA_BASE+stockCode+".NS?formatted=true&interval=1d&range=6mo";
         String rawdata = client.getHTTPData(url);
 
         List<DataPoint> op = new ArrayList<>();
@@ -45,22 +49,17 @@ public class NasdaqService {
         Gson g = new Gson();
 
         // Read a single attribute
-        JsonObject rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("dataset");
-        JsonArray columnList = rawJson.getAsJsonArray("column_names");
-
-        int dateIdx = -1;
-        int closeIdx = -1;
-        for(int i=0;i<columnList.size();i++){
-            if(columnList.get(i).getAsString().equals("Date")){
-                dateIdx = i;
-            }else if(columnList.get(i).getAsString().equals("Close")){
-                closeIdx = i;
-            }
-        }
-        JsonArray dataArr = rawJson.getAsJsonArray("data");
-        for(JsonElement data : dataArr){
-            JsonArray currData = (JsonArray)data;
-            DataPoint dp = new NasdaqHistDataPoint(currData.get(dateIdx).getAsString(),currData.get(closeIdx).getAsFloat());
+        JsonObject rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("chart");
+        JsonObject dataArr = rawJson.getAsJsonArray("result").get(0).getAsJsonObject();
+        JsonArray timeStamps = dataArr.getAsJsonArray("timestamp");
+        JsonArray closeData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("close");
+        //System.out.println("c=urr milli time "+System.currentTimeMillis());
+        for(int i=0;i< timeStamps.size();i++){
+            long timeStamp = timeStamps.get(i).getAsLong();
+            Date d = new Date(timeStamp*1000);
+            String date = new SimpleDateFormat(US_DATE_FORMAT).format(d);
+            float amt = closeData.get(i).getAsFloat();
+            DataPoint dp = new BSEHistDataPoint(date,amt);
             op.add(dp);
         }
 

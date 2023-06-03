@@ -1,6 +1,8 @@
 package com.kaway.main;
 
 
+import com.kaway.actions.ExchangeActions;
+import com.kaway.beans.DataPoint;
 import com.kaway.beans.NasdaqHistDataPoint;
 import com.kaway.db.BaseDAO;
 import com.kaway.service.NasdaqService;
@@ -52,7 +54,7 @@ class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyE
 class KawayController {
 
   @Autowired
-  NasdaqService nasdaqService;
+  ExchangeActions exchangeActions;
 
   @Autowired
   BaseDAO baseDao;
@@ -63,21 +65,11 @@ class KawayController {
   }
 
   @GetMapping("/histData/{exchange}/{secId}")
-  List<NasdaqHistDataPoint> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId,@RequestParam(name = "stDate") String startDate, @RequestParam String endDate) throws IOException, ExecutionException, InterruptedException {
+  List<DataPoint> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "stDate") String startDate, @RequestParam String endDate) throws IOException, ExecutionException, InterruptedException {
     //NasdaqService service = new NasdaqService();
     System.out.println("exchange="+exchange+" secId="+secId+" stDate ="+startDate+"  endDate="+endDate);
-    Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
-    List<NasdaqHistDataPoint> freshdata = null;
-    String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
-    if(data==null || !data.containsKey(today)){
-      freshdata = nasdaqService.getHistData(exchange,secId);
-      Map<String,List<NasdaqHistDataPoint>> dbData = new HashMap<>();
-      dbData.put(today,freshdata);
-      baseDao.setDailySecData(exchange,secId,dbData);
-    }else{
-      freshdata = (List<NasdaqHistDataPoint>) data.get(today);
-    }
-    return freshdata;
+    List<DataPoint> data  = exchangeActions.getExchangeData(exchange,secId);
+    return data;
   }
 
 }

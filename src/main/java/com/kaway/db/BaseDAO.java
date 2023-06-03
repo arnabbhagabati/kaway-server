@@ -4,6 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.WriteResult;
+import com.kaway.beans.DataPoint;
 import com.kaway.beans.NasdaqHistDataPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class BaseDAO {
     @Autowired
     FireStoreConfig fireStoreConfig;
 
-    public void setDailySecData(String exchange, String secId, Map<String,List<NasdaqHistDataPoint>> data) throws IOException, ExecutionException, InterruptedException {
+    public void setDailySecData(String exchange, String secId, Map<String,List<DataPoint>> data) throws IOException, ExecutionException, InterruptedException {
 
         // Add a new document (asynchronously) in collection "cities" with id "LA"
         ApiFuture<WriteResult> future = fireStoreConfig.dbContainer().db.collection(exchange).document(secId).set(data);
