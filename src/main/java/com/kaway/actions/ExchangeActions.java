@@ -1,12 +1,11 @@
 package com.kaway.actions;
 
-import com.google.cloud.BaseService;
-import com.kaway.beans.BSESec;
+import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
-import com.kaway.beans.NasdaqHistDataPoint;
 import com.kaway.db.BaseDAO;
 import com.kaway.service.BSEService;
 import com.kaway.service.NSEDataService;
+import com.kaway.service.NSEService;
 import com.kaway.service.NasdaqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +36,9 @@ public class ExchangeActions {
 
     @Autowired
     BSEService bseService;
+
+    @Autowired
+    NSEService nseService;
 
     public List<DataPoint> getExchangeData(String exchange,String secId) throws IOException, ExecutionException, InterruptedException {
         Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
@@ -79,9 +80,9 @@ public class ExchangeActions {
         return sortedData;
     }
 
-    public List<BSESec> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException {
+    public List<Security> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException {
 
-        List<BSESec> op = new ArrayList<>();
+        List<Security> op = new ArrayList<>();
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
         long daysBetween = 0;
 
@@ -104,16 +105,16 @@ public class ExchangeActions {
                     op = bseService.getSecList();
                     break;
                 case NSE_EXCHANGE:
-                    op = null;
+                    op = nseService.getSecList();
                     break;
             }
 
-            Map<String, List<BSESec>> secList = new HashMap<>();
+            Map<String, List<Security>> secList = new HashMap<>();
             secList.put(today, op);
             baseDao.setSecList(exchange, secList);
 
         } else {
-            op = (List<BSESec>) data.get(today);
+            op = (List<Security>) data.get(today);
         }
 
         return op;

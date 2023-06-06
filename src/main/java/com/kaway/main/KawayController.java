@@ -2,11 +2,8 @@ package com.kaway.main;
 
 
 import com.kaway.actions.ExchangeActions;
-import com.kaway.beans.BSESec;
+import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
-import com.kaway.beans.NasdaqHistDataPoint;
-import com.kaway.db.BaseDAO;
-import com.kaway.service.NasdaqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -19,14 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import static com.kaway.main.KawayConstants.*;
 
 @Component
 @Order(0)
@@ -71,10 +62,10 @@ class KawayController {
   }
 
   @GetMapping("/secList/{exchange}")
-  List<BSESec> getSecData(@PathVariable(value="exchange") String exchange) throws IOException, ExecutionException, InterruptedException {
+  List<Security> getSecData(@PathVariable(value="exchange") String exchange) throws IOException, ExecutionException, InterruptedException {
     //NasdaqService service = new NasdaqService();
     //System.out.println("exchange="+exchange+" secId="+secId+" stDate ="+startDate+"  endDate="+endDate);
-    List<BSESec> data  = exchangeActions.getSecList(exchange);
+    List<Security> data  = exchangeActions.getSecList(exchange);
     return data;
   }
 

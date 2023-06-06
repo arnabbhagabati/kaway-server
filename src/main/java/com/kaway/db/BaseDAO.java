@@ -4,9 +4,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.WriteResult;
-import com.kaway.beans.BSESec;
+import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
-import com.kaway.beans.NasdaqHistDataPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +63,7 @@ public class BaseDAO {
         return null;
     }
 
-    public void setSecList(String exchange, Map<String, List<BSESec>> data) throws IOException, ExecutionException, InterruptedException {
+    public void setSecList(String exchange, Map<String, List<Security>> data) throws IOException, ExecutionException, InterruptedException {
 
         // Add a new document (asynchronously) in collection "cities" with id "LA"
         ApiFuture<WriteResult> future = fireStoreConfig.dbContainer().db.collection(exchange).document(SEC_LIST).set(data);

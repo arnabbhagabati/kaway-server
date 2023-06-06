@@ -1,11 +1,11 @@
 package com.kaway.beans;
 
-public class BSESec {
+public class Security {
     private String code;
     private String id;
     private String name;
 
-    public BSESec(String code, String id, String name) {
+    public Security(String code, String id, String name) {
         this.code = code;
         this.id = id;
         this.name = name;
