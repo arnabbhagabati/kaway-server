@@ -2,6 +2,7 @@ package com.kaway.main;
 
 
 import com.kaway.actions.ExchangeActions;
+import com.kaway.beans.BSESec;
 import com.kaway.beans.DataPoint;
 import com.kaway.beans.NasdaqHistDataPoint;
 import com.kaway.db.BaseDAO;
@@ -56,9 +57,6 @@ class KawayController {
   @Autowired
   ExchangeActions exchangeActions;
 
-  @Autowired
-  BaseDAO baseDao;
-
   @GetMapping("/")
   String hello() {
     return "Hello magga!";
@@ -69,6 +67,14 @@ class KawayController {
     //NasdaqService service = new NasdaqService();
     System.out.println("exchange="+exchange+" secId="+secId+" stDate ="+startDate+"  endDate="+endDate);
     List<DataPoint> data  = exchangeActions.getExchangeData(exchange,secId);
+    return data;
+  }
+
+  @GetMapping("/secList/{exchange}")
+  List<BSESec> getSecData(@PathVariable(value="exchange") String exchange) throws IOException, ExecutionException, InterruptedException {
+    //NasdaqService service = new NasdaqService();
+    //System.out.println("exchange="+exchange+" secId="+secId+" stDate ="+startDate+"  endDate="+endDate);
+    List<BSESec> data  = exchangeActions.getSecList(exchange);
     return data;
   }
 

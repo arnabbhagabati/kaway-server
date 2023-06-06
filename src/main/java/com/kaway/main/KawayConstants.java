@@ -7,4 +7,5 @@ public class KawayConstants {
     public static final String NSE_EXCHANGE = "NSE";
     public static String DEFAULT_DATE_FORMAT = "dd-MM-yyyy";
     public static String US_DATE_FORMAT = "yyyy-MM-dd";
+    public static String SEC_LIST= "securitiesList";
 }

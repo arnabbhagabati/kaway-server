@@ -27,7 +27,7 @@ public class NasdaqService {
     //Todo : move this to more secure loc
     private static String API_KEY = "-oTncyawbkcCWCAn_Jqx";
 
-    public List<DataPoint> getHistData(String exchngCode, String stockCode) throws InterruptedException {
+    public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode) throws InterruptedException {
 
         System.out.println("LAST call time is "+LAST_CALL_TIME);
         if((System.currentTimeMillis() - LAST_CALL_TIME) < GAP_BETWEEN_CALLS){
@@ -67,4 +67,5 @@ public class NasdaqService {
         return op;
 
     }
+
 }
