@@ -20,7 +20,7 @@ public class NasdaqService {
     @Autowired
     HTTPClient client;
 
-    private static String NASDAQ_HIST_DATA_BASE = "https://data.nasdaq.com/api/v3/datasets/";
+    private static String NASDAQ_HIST_DATA_BASE = "https://data.nasdaq.com/api/v3/datasets";
     private static int GAP_BETWEEN_CALLS = 5000;
     private static long LAST_CALL_TIME = System.currentTimeMillis();
 
@@ -37,7 +37,7 @@ public class NasdaqService {
         LAST_CALL_TIME = System.currentTimeMillis();
         System.out.println("Calling  "+NASDAQ_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
-        String url =NASDAQ_HIST_DATA_BASE+"/"+exchngCode+"/"+stockCode+".json?API_KEY="+API_KEY;
+        String url =NASDAQ_HIST_DATA_BASE+"/"+exchngCode+"/"+"BOM"+stockCode+".json?API_KEY="+API_KEY;
         String rawdata = client.getHTTPData(url);
 
         List<DataPoint> op = new ArrayList<>();

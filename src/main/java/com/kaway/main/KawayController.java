@@ -63,8 +63,6 @@ class KawayController {
 
   @GetMapping("/secList/{exchange}")
   List<Security> getSecData(@PathVariable(value="exchange") String exchange) throws IOException, ExecutionException, InterruptedException {
-    //NasdaqService service = new NasdaqService();
-    //System.out.println("exchange="+exchange+" secId="+secId+" stDate ="+startDate+"  endDate="+endDate);
     List<Security> data  = exchangeActions.getSecList(exchange);
     return data;
   }

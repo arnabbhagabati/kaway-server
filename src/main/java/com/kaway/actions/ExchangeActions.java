@@ -85,12 +85,13 @@ public class ExchangeActions {
         List<Security> op = new ArrayList<>();
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
         long daysBetween = 0;
+        String dataDate = "";
 
         Map<String, Object> data = baseDao.getSecList(exchange);
 
         if(data != null) {
             Map.Entry<String, Object> firstEntry = data.entrySet().iterator().next();
-            String dataDate = firstEntry.getKey();
+            dataDate = firstEntry.getKey();
 
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
             LocalDate date1 = LocalDate.parse(dataDate, dtf);
@@ -114,7 +115,7 @@ public class ExchangeActions {
             baseDao.setSecList(exchange, secList);
 
         } else {
-            op = (List<Security>) data.get(today);
+            op = (List<Security>) data.get(dataDate);
         }
 
         return op;
