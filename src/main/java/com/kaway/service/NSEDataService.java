@@ -41,7 +41,7 @@ public class NSEDataService {
         LAST_CALL_TIME = System.currentTimeMillis();
         System.out.println("Calling  "+NSE_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
-        String url =NSE_HIST_DATA_BASE+stockCode+".NS?formatted=true&interval=1d&range=6mo";
+        String url =NSE_HIST_DATA_BASE+stockCode+".NS?formatted=true&interval=1d&range=2y";
         String rawdata = client.getHTTPData(url);
 
         List<DataPoint> op = new ArrayList<>();
