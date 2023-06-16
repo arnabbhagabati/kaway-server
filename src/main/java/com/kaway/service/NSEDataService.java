@@ -52,14 +52,22 @@ public class NSEDataService {
         JsonObject rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("chart");
         JsonObject dataArr = rawJson.getAsJsonArray("result").get(0).getAsJsonObject();
         JsonArray timeStamps = dataArr.getAsJsonArray("timestamp");
+        JsonArray openData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("open");
         JsonArray closeData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("close");
+        JsonArray highData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("high");
+        JsonArray lowData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("low");
+        JsonArray volumeData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("volume");
         //System.out.println("c=urr milli time "+System.currentTimeMillis());
         for(int i=0;i< timeStamps.size();i++){
             long timeStamp = timeStamps.get(i).getAsLong();
             Date d = new Date(timeStamp*1000);
             String date = new SimpleDateFormat(US_DATE_FORMAT).format(d);
-            float amt = closeData.get(i).getAsFloat();
-            DataPoint dp = new BSEHistDataPoint(date,amt);
+            float open = openData.get(i).getAsFloat();
+            float close = closeData.get(i).getAsFloat();
+            float high = highData.get(i).getAsFloat();
+            float low = lowData.get(i).getAsFloat();
+            int vol = volumeData.get(i).getAsInt();
+            DataPoint dp = new BSEHistDataPoint(date,open,close,high,low,vol);
             op.add(dp);
         }
 

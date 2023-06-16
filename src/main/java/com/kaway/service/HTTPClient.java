@@ -18,7 +18,7 @@ public class HTTPClient {
 
     public String getHTTPData(String endpoint){
         StringBuilder op = new StringBuilder();
-        String responseBody = "";
+        System.out.println("HTTP call with URL "+endpoint);
 
         try {
 
@@ -42,7 +42,7 @@ public class HTTPClient {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
-            //conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8");
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 
             if (conn.getResponseCode() != 200) {

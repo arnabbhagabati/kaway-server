@@ -49,18 +49,37 @@ public class NasdaqService {
         JsonArray columnList = rawJson.getAsJsonArray("column_names");
 
         int dateIdx = -1;
+        int openIdx = -1;
         int closeIdx = -1;
+        int highIdx = -1;
+        int lowIdx = -1;
+        int volumeIdx = -1;
+
         for(int i=0;i<columnList.size();i++){
             if(columnList.get(i).getAsString().equals("Date")){
                 dateIdx = i;
+            }else if(columnList.get(i).getAsString().equals("Open")){
+                openIdx = i;
             }else if(columnList.get(i).getAsString().equals("Close")){
                 closeIdx = i;
+            }else if(columnList.get(i).getAsString().equals("High")){
+                highIdx = i;
+            }else if(columnList.get(i).getAsString().equals("Low")){
+                lowIdx = i;
+            }else if(columnList.get(i).getAsString().equals("No. of Shares")){
+                volumeIdx = i;
             }
         }
         JsonArray dataArr = rawJson.getAsJsonArray("data");
         for(JsonElement data : dataArr){
             JsonArray currData = (JsonArray)data;
-            DataPoint dp = new NasdaqHistDataPoint(currData.get(dateIdx).getAsString(),currData.get(closeIdx).getAsFloat());
+            DataPoint dp = new NasdaqHistDataPoint(currData.get(dateIdx).getAsString(),
+                                                    currData.get(openIdx).getAsFloat(),
+                                                    currData.get(closeIdx).getAsFloat(),
+                                                    currData.get(highIdx).getAsFloat(),
+                                                    currData.get(lowIdx).getAsFloat(),
+                                                    currData.get(volumeIdx).getAsInt()
+                                                    );
             op.add(dp);
         }
 
