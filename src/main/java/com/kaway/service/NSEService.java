@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class NSEService {
         for(String s : rawdata){
             String[] fields = s.split(",");
             if(cnt>0){
-                list.add(new Security(fields[0],fields[0],fields[1]));
+                list.add(new Security(fields[0],fields[0],fields[1], SecType.UNKNOWN));
             }
             cnt++;
         }

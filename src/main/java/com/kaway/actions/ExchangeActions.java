@@ -40,7 +40,7 @@ public class ExchangeActions {
     @Autowired
     NSEService nseService;
 
-    public List<DataPoint> getExchangeData(String exchange,String secId) throws IOException, ExecutionException, InterruptedException {
+    public List<DataPoint> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
         Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
         List<DataPoint> sortedData = null;
         List<DataPoint> freshData = null;
@@ -49,7 +49,7 @@ public class ExchangeActions {
 
             switch(exchange){
                 case BSE_EXCHANGE:
-                    freshData = nasdaqService.getHistData(exchange,secId);
+                    freshData = nasdaqService.getHistData(exchange,secId,type);
                     break;
                 case NSE_EXCHANGE:
                     freshData = nseDataService.getHistData(exchange,secId);
@@ -103,7 +103,7 @@ public class ExchangeActions {
 
             switch (exchange) {
                 case BSE_EXCHANGE:
-                    op = bseService.getSecList();
+                    op = nasdaqService.getSecList();
                     break;
                 case NSE_EXCHANGE:
                     op = nseService.getSecList();

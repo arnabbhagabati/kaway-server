@@ -3,15 +3,17 @@ package com.kaway.service;
 import com.google.gson.*;
 import com.kaway.beans.DataPoint;
 import com.kaway.beans.NasdaqHistDataPoint;
+import com.kaway.beans.SecType;
+import com.kaway.beans.Security;
+import com.kaway.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,6 +22,15 @@ public class NasdaqService {
     @Autowired
     HTTPClient client;
 
+    @Autowired
+    ZipHttpClient zipClient;
+
+    @Autowired
+    FileUtil fileUtil;
+
+    @Autowired
+    BSEService bseService;
+
     private static String NASDAQ_HIST_DATA_BASE = "https://data.nasdaq.com/api/v3/datasets";
     private static int GAP_BETWEEN_CALLS = 5000;
     private static long LAST_CALL_TIME = System.currentTimeMillis();
@@ -27,7 +38,7 @@ public class NasdaqService {
     //Todo : move this to more secure loc
     private static String API_KEY = "-oTncyawbkcCWCAn_Jqx";
 
-    public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode) throws InterruptedException {
+    public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode,String type) throws InterruptedException {
 
         System.out.println("LAST call time is "+LAST_CALL_TIME);
         if((System.currentTimeMillis() - LAST_CALL_TIME) < GAP_BETWEEN_CALLS){
@@ -37,7 +48,17 @@ public class NasdaqService {
         LAST_CALL_TIME = System.currentTimeMillis();
         System.out.println("Calling  "+NASDAQ_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
-        String url =NASDAQ_HIST_DATA_BASE+"/"+exchngCode+"/"+"BOM"+stockCode+".json?API_KEY="+API_KEY;
+        String url = NASDAQ_HIST_DATA_BASE+"/"+exchngCode+"/"+stockCode+".json?API_KEY="+API_KEY;
+
+        /*switch(SecType.valueOf(type)){
+            case STOCK:
+                url = url+stockCode+".json?API_KEY="+API_KEY;
+                break;
+            case INDEX:
+                url = url+stockCode+".json?API_KEY="+API_KEY;
+                break;
+        }*/
+
         String rawdata = client.getHTTPData(url);
 
         List<DataPoint> op = new ArrayList<>();
@@ -71,20 +92,61 @@ public class NasdaqService {
             }
         }
         JsonArray dataArr = rawJson.getAsJsonArray("data");
+
         for(JsonElement data : dataArr){
-            JsonArray currData = (JsonArray)data;
-            DataPoint dp = new NasdaqHistDataPoint(currData.get(dateIdx).getAsString(),
-                                                    currData.get(openIdx).getAsFloat(),
-                                                    currData.get(closeIdx).getAsFloat(),
-                                                    currData.get(highIdx).getAsFloat(),
-                                                    currData.get(lowIdx).getAsFloat(),
-                                                    currData.get(volumeIdx).getAsInt()
-                                                    );
-            op.add(dp);
+            try {
+                JsonArray currData = (JsonArray) data;
+                DataPoint dp = new NasdaqHistDataPoint(currData.get(dateIdx).getAsString(),
+                        currData.get(openIdx).getAsFloat(),
+                        currData.get(closeIdx).getAsFloat(),
+                        currData.get(highIdx).getAsFloat(),
+                        currData.get(lowIdx).getAsFloat(),
+                        type.equals(SecType.STOCK) ? currData.get(volumeIdx).getAsInt() : -99
+                );
+                op.add(dp);
+            }catch(Exception e){
+                System.out.println(e);
+            }
         }
 
         return op;
 
+    }
+
+
+    public List<Security> getSecList() throws IOException {
+        String zipFile = "BSESecList.zip";
+        zipClient.getHTTPData("https://data.nasdaq.com/api/v3/databases/BSE/metadata?api_key="+API_KEY,zipFile);
+        List<List<String>> records = fileUtil.readCsvFromZip(zipFile);
+
+        Map<String,Security> secFromBSe = bseService.getSecList();
+        List<Security> op = new ArrayList<>();
+
+        boolean header = true;
+        for(List<String> strs : records){
+            if(header){
+                header = false;
+            }else{
+                Security bseDataSec = secFromBSe.get(strs.get(0).substring(3));
+                Security sec = null;
+                if(bseDataSec != null) {
+                    if(strs.get(0).startsWith("BOM")){
+                        sec = new Security(strs.get(0), bseDataSec.getId(), bseDataSec.getName(), SecType.STOCK);
+                    }else{
+                        sec = new Security(strs.get(0), bseDataSec.getId(), bseDataSec.getName(), SecType.INDEX);
+                    }
+                }else{
+                    if(strs.get(0).startsWith("BOM")) {
+                        sec = new Security(strs.get(0), strs.get(1), strs.get(1),SecType.STOCK);
+                    }else{
+                        sec = new Security(strs.get(0), strs.get(1).replaceFirst("BSE ",""), strs.get(1),SecType.INDEX);
+                    }
+                }
+                op.add(sec);
+            }
+        }
+        new File(zipFile).delete();
+        return op;
     }
 
 }
