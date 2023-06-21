@@ -10,6 +10,7 @@ import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.io.FileUtils;
 
 @Service
 public class FileUtil {
@@ -49,7 +50,7 @@ public class FileUtil {
                     }
                 }
 
-                parent.delete();
+                FileUtils.deleteDirectory(parent);
             }
             zipEntry = zis.getNextEntry();
         }
