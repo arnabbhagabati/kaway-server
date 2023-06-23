@@ -63,6 +63,19 @@ public class FileUtil {
 
     }
 
+
+    public List<List<String>> getCsvRecords(File newFile) throws FileNotFoundException {
+        List<List<String>> records = new ArrayList<>();
+
+        try (Scanner scanner = new Scanner(newFile)) {
+            while (scanner.hasNextLine()) {
+                records.add(getRecordFromLine(scanner.nextLine()));
+            }
+        }
+
+        return records;
+    }
+
     private File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
 

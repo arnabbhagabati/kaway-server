@@ -14,7 +14,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+
+import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
 
 @Component
 public class NasdaqService {
@@ -33,7 +36,7 @@ public class NasdaqService {
 
     private static String NASDAQ_HIST_DATA_BASE = "https://data.nasdaq.com/api/v3/datasets";
     private static int GAP_BETWEEN_CALLS = 5000;
-    private static long LAST_CALL_TIME = System.currentTimeMillis();
+    private static AtomicLong LAST_CALL_TIME = new AtomicLong(System.currentTimeMillis());
 
     //Todo : move this to more secure loc
     private static String API_KEY = "-oTncyawbkcCWCAn_Jqx";
@@ -41,11 +44,11 @@ public class NasdaqService {
     public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode,String type) throws InterruptedException {
 
         System.out.println("LAST call time is "+LAST_CALL_TIME);
-        if((System.currentTimeMillis() - LAST_CALL_TIME) < GAP_BETWEEN_CALLS){
+        if((System.currentTimeMillis() - LAST_CALL_TIME.get()) < GAP_BETWEEN_CALLS){
             System.out.println("Too frequent calls. Time is "+System.currentTimeMillis()+" LAST_CALL_TIME "+LAST_CALL_TIME);
             Thread.sleep(GAP_BETWEEN_CALLS);
         }
-        LAST_CALL_TIME = System.currentTimeMillis();
+        LAST_CALL_TIME.set(System.currentTimeMillis());
         System.out.println("Calling  "+NASDAQ_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
         String url = NASDAQ_HIST_DATA_BASE+"/"+exchngCode+"/"+stockCode+".json?API_KEY="+API_KEY;
@@ -134,12 +137,36 @@ public class NasdaqService {
                         sec = new Security(strs.get(0), bseDataSec.getId(), bseDataSec.getName(), SecType.STOCK);
                     }else{
                         sec = new Security(strs.get(0), bseDataSec.getId(), bseDataSec.getName(), SecType.INDEX);
+                        File f = new File("src/main/resources/"+strs.get(0)+".csv");
+                        if(GET_INDEX_CONSTITUENTS && f.exists() && !f.isDirectory()) {
+                            List<List<String>> constituentSecs = fileUtil.getCsvRecords(f);
+                            List<String> constituents = new ArrayList<>();
+                            for(List<String> consSec : constituentSecs){
+                                if(consSec.get(0).startsWith("Scrip")) continue;
+                                constituents.add("BOM"+consSec.get(0));
+                            }
+                            Security allSec = new Security(strs.get(0)+" ALL", bseDataSec.getId()+" ALL", bseDataSec.getName()+" ALL", SecType.INDEX_ALL);
+                            allSec.setConstituents(constituents);
+                            op.add(allSec);
+                        }
                     }
                 }else{
                     if(strs.get(0).startsWith("BOM")) {
                         sec = new Security(strs.get(0), strs.get(1), strs.get(1),SecType.STOCK);
                     }else{
                         sec = new Security(strs.get(0), strs.get(1).replaceFirst("BSE ",""), strs.get(1),SecType.INDEX);
+                        File f = new File("src/main/resources/"+strs.get(0)+".csv");
+                        if(GET_INDEX_CONSTITUENTS && f.exists() && !f.isDirectory()) {
+                            List<List<String>> constituentSecs = fileUtil.getCsvRecords(f);
+                            List<String> constituents = new ArrayList<>();
+                            for(List<String> consSec : constituentSecs){
+                                if(consSec.get(0).startsWith("Scrip")) continue;
+                                constituents.add("BOM"+consSec.get(0));
+                            }
+                            Security allSec = new Security(strs.get(0)+" ALL", strs.get(1).replaceFirst("BSE ","")+" ALL", strs.get(1)+" ALL", SecType.INDEX_ALL);
+                            allSec.setConstituents(constituents);
+                            op.add(allSec);
+                        }
                     }
                 }
                 op.add(sec);

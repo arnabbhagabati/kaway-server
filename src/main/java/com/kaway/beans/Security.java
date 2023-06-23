@@ -1,10 +1,13 @@
 package com.kaway.beans;
 
+import java.util.List;
+
 public class Security {
     private String code;
     private String id;
     private String name;
     private SecType type;
+    private List<String> constituents;
 
     public Security(String code, String id, String name,SecType type) {
         this.code = code;
@@ -43,5 +46,13 @@ public class Security {
 
     public void setType(SecType type) {
         this.type = type;
+    }
+
+    public List<String> getConstituents() {
+        return constituents;
+    }
+
+    public void setConstituents(List<String> constituents) {
+        this.constituents = constituents;
     }
 }
