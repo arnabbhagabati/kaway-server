@@ -52,7 +52,7 @@ public class ExchangeActions {
                     freshData = nasdaqService.getHistData(exchange,secId,type);
                     break;
                 case NSE_EXCHANGE:
-                    freshData = nseDataService.getHistData(exchange,secId);
+                    freshData = nseDataService.getHistData(exchange,secId,type);
                     break;
             }
 
