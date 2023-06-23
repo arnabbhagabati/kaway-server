@@ -18,7 +18,7 @@ public class HTTPClient {
 
     public String getHTTPData(String endpoint){
         StringBuilder op = new StringBuilder();
-        String responseBody = "";
+        System.out.println("HTTP call with URL "+endpoint+ " at "+System.currentTimeMillis());
 
         try {
 
@@ -42,12 +42,12 @@ public class HTTPClient {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
-            //conn.setRequestProperty("Content-Type", "application/json; utf-8");
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+            //conn.setRequestProperty("Content-Type", "application/json; utf-8");  // Note - yahho fin api does not work with utf 8
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
 
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
+                        + conn.getResponseCode()+ " for "+url);
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader(

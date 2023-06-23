@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.kaway.beans.BSEHistDataPoint;
 import com.kaway.beans.DataPoint;
 import com.kaway.beans.NasdaqHistDataPoint;
+import com.kaway.beans.SecType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static com.kaway.main.KawayConstants.*;
@@ -26,41 +28,57 @@ public class NSEDataService {
 
     private static String NSE_HIST_DATA_BASE = "https://query2.finance.yahoo.com/v8/finance/chart/";
     private static int GAP_BETWEEN_CALLS = 5000;
-    private static long LAST_CALL_TIME = System.currentTimeMillis();
+    private static AtomicLong LAST_CALL_TIME = new AtomicLong(System.currentTimeMillis());
 
     //Todo : move this to more secure loc
     private static String API_KEY = "-oTncyawbkcCWCAn_Jqx";
 
-    public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode) throws InterruptedException {
+    public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode,String type) throws InterruptedException {
 
         System.out.println("LAST call time is "+LAST_CALL_TIME);
-        if((System.currentTimeMillis() - LAST_CALL_TIME) < GAP_BETWEEN_CALLS){
+        if((System.currentTimeMillis() - LAST_CALL_TIME.get()) < GAP_BETWEEN_CALLS){
             System.out.println("Too frequent calls. Time is "+System.currentTimeMillis()+" LAST_CALL_TIME "+LAST_CALL_TIME);
             Thread.sleep(GAP_BETWEEN_CALLS);
         }
-        LAST_CALL_TIME = System.currentTimeMillis();
+        LAST_CALL_TIME.set(System.currentTimeMillis());
         System.out.println("Calling  "+NSE_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
-        String url =NSE_HIST_DATA_BASE+stockCode+".NS?formatted=true&interval=1d&range=6mo";
+        String url =NSE_HIST_DATA_BASE+stockCode;
+        if(type.equals(SecType.INDEX.toString())){
+            url = url+"?formatted=true&interval=1d&range=2y";
+        }else{
+            url =url+".NS?formatted=true&interval=1d&range=2y";
+        }
+
         String rawdata = client.getHTTPData(url);
-
         List<DataPoint> op = new ArrayList<>();
-
         Gson g = new Gson();
 
         // Read a single attribute
         JsonObject rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("chart");
         JsonObject dataArr = rawJson.getAsJsonArray("result").get(0).getAsJsonObject();
         JsonArray timeStamps = dataArr.getAsJsonArray("timestamp");
+        JsonArray openData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("open");
         JsonArray closeData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("close");
+        JsonArray highData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("high");
+        JsonArray lowData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("low");
+        JsonArray volumeData = dataArr.getAsJsonObject("indicators").getAsJsonArray("quote").get(0).getAsJsonObject().getAsJsonArray("volume");
         //System.out.println("c=urr milli time "+System.currentTimeMillis());
         for(int i=0;i< timeStamps.size();i++){
-            long timeStamp = timeStamps.get(i).getAsLong();
-            Date d = new Date(timeStamp*1000);
-            String date = new SimpleDateFormat(US_DATE_FORMAT).format(d);
-            float amt = closeData.get(i).getAsFloat();
-            DataPoint dp = new BSEHistDataPoint(date,amt);
-            op.add(dp);
+            try {
+                long timeStamp = timeStamps.get(i).getAsLong();
+                Date d = new Date(timeStamp * 1000);
+                String date = new SimpleDateFormat(US_DATE_FORMAT).format(d);
+                float open = openData.get(i).getAsFloat();
+                float close = closeData.get(i).getAsFloat();
+                float high = highData.get(i).getAsFloat();
+                float low = lowData.get(i).getAsFloat();
+                int vol = volumeData.get(i).getAsInt();
+                DataPoint dp = new BSEHistDataPoint(date, open, close, high, low, vol);
+                op.add(dp);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
 
         return op;
