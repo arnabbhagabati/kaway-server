@@ -121,4 +121,41 @@ public class ExchangeActions {
         return op;
     }
 
+    public void loadExchangeDataForSec(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+        Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
+        List<DataPoint> sortedData = null;
+        List<DataPoint> freshData = null;
+        String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
+        if(data==null || !data.containsKey(today)){
+            switch(exchange){
+                case BSE_EXCHANGE:
+                    freshData = nasdaqService.getHistData(exchange,secId,type);
+                    break;
+                case NSE_EXCHANGE:
+                    freshData = nseDataService.getHistData(exchange,secId,type);
+                    break;
+            }
+
+            sortedData = freshData.stream().sorted(new Comparator<DataPoint>() {
+                @Override
+                public int compare(DataPoint o1, DataPoint o2) {
+                    try {
+                        Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(o1.getTime());
+                        Date date2 = new SimpleDateFormat("yyyy-MM-dd").parse(o2.getTime());
+
+                        return date1.compareTo(date2);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return 0;
+                }
+            }).collect(Collectors.toList());
+
+            Map<String,List<DataPoint>> dbData = new HashMap<>();
+            dbData.put(today,sortedData);
+            baseDao.setDailySecData(exchange,secId,dbData);
+            Thread.sleep(20000);
+        }
+    }
+
 }

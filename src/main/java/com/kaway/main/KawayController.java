@@ -44,7 +44,7 @@ class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyE
   }
 }
 
-@CrossOrigin(origins = {"https://kaway-n3ahptldka-el.a.run.app","http://localhost:3000"})
+@CrossOrigin(origins = {"https://kaway-n3ahptldka-el.a.run.app","http://localhost:3000","https://kaway-n3ahptldka-as.a.run.app"})
 @RestController
 class KawayController {
 
@@ -78,8 +78,7 @@ class KawayController {
         if(secMap.get("type").equals(SecType.INDEX_ALL.toString())){
               List<String> constituents = (List<String>) secMap.get("constituents");
               for(String code : constituents){
-                  exchangeActions.getExchangeData(exchange,code,"STOCK");
-                  Thread.sleep(20000);
+                  exchangeActions.loadExchangeDataForSec(exchange,code,"STOCK");
               }
         }
     }
