@@ -44,7 +44,7 @@ class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyE
   }
 }
 
-@CrossOrigin(origins = {"https://kaway-n3ahptldka-el.a.run.app","http://localhost:3000","https://kaway-n3ahptldka-as.a.run.app"})
+@CrossOrigin(origins = {"https://bullcharts.org","http://localhost:3000","https://kaway-n3ahptldka-as.a.run.app"})
 @RestController
 class KawayController {
 
