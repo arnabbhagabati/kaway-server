@@ -8,6 +8,7 @@ import com.kaway.service.NSEDataService;
 import com.kaway.service.NSEService;
 import com.kaway.service.NasdaqService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -80,6 +81,7 @@ public class ExchangeActions {
         return sortedData;
     }
 
+    @Cacheable(value = "secListCache")
     public List<Security> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException {
 
         List<Security> op = new ArrayList<>();
