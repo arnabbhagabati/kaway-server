@@ -44,7 +44,7 @@ class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyE
   }
 }
 
-@CrossOrigin(origins = {"https://kaway-n3ahptldka-el.a.run.app","http://localhost:3000"})
+@CrossOrigin(origins = {"https://bullcharts.org","http://localhost:3000","https://kaway-n3ahptldka-as.a.run.app","http://localhost:8080"})
 @RestController
 class KawayController {
 
@@ -57,9 +57,9 @@ class KawayController {
   }
 
   @GetMapping("/histData/{exchange}/{secId}")
-  List<DataPoint> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type,@RequestParam(name = "stDate") String startDate, @RequestParam String endDate) throws IOException, ExecutionException, InterruptedException {
+  List<DataPoint> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type) throws IOException, ExecutionException, InterruptedException {
     //NasdaqService service = new NasdaqService();
-    System.out.println("exchange="+exchange+" secId="+secId+" stDate ="+startDate+"  endDate="+endDate);
+    System.out.println("exchange="+exchange+" secId="+secId+" type ="+type);
     List<DataPoint> data  = exchangeActions.getExchangeData(exchange,secId,type);
     return data;
   }
@@ -71,15 +71,16 @@ class KawayController {
   }
 
   @GetMapping("/loadData/{exchange}")
-  String loadData(@PathVariable(value="exchange") String exchange) throws IOException, ExecutionException, InterruptedException {
+  String loadData(@PathVariable(value="exchange") String exchange,@RequestParam(name = "idxCode") String idxCode) throws IOException, ExecutionException, InterruptedException {
     Object secListData  = (Object) exchangeActions.getSecList(exchange);
     List<HashMap<String,Object>> secData = (List<HashMap<String,Object>>) secListData;
     for(HashMap<String,Object> secMap : secData){
         if(secMap.get("type").equals(SecType.INDEX_ALL.toString())){
-              List<String> constituents = (List<String>) secMap.get("constituents");
-              for(String code : constituents){
-                  exchangeActions.getExchangeData(exchange,code,"STOCK");
-                  Thread.sleep(20000);
+              if(null==idxCode || idxCode.isEmpty() || idxCode.equals(secMap.get("code"))) {
+                List<String> constituents = (List<String>) secMap.get("constituents");
+                for (String code : constituents) {
+                  exchangeActions.loadExchangeDataForSec(exchange, code, "STOCK");
+                }
               }
         }
     }

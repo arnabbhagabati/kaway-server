@@ -1,8 +1,9 @@
 package com.kaway.beans;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Security {
+public class Security implements Serializable {
     private String code;
     private String id;
     private String name;
