@@ -3,10 +3,7 @@ package com.kaway.actions;
 import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
 import com.kaway.db.BaseDAO;
-import com.kaway.service.BSEService;
-import com.kaway.service.NSEDataService;
-import com.kaway.service.NSEService;
-import com.kaway.service.NasdaqService;
+import com.kaway.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -36,24 +33,36 @@ public class ExchangeActions {
     NSEDataService nseDataService;
 
     @Autowired
+    MboumDataService mboumDataService;
+
+    @Autowired
     BSEService bseService;
 
     @Autowired
     NSEService nseService;
 
-    public List<DataPoint> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+    public List<DataPoint> getSecDataFromDb(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
         Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
+        String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
+        List<DataPoint> freshData = null;
+        if(data!=null && data.containsKey(today)){
+            freshData = (List<DataPoint>) data.get(today);
+        }
+        return freshData;
+    }
+
+    public List<DataPoint> getSecDataFromSource(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
         List<DataPoint> sortedData = null;
         List<DataPoint> freshData = null;
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
-        if(data==null || !data.containsKey(today)){
+
 
             switch(exchange){
                 case BSE_EXCHANGE:
                     freshData = nasdaqService.getHistData(exchange,secId,type);
                     break;
                 case NSE_EXCHANGE:
-                    freshData = nseDataService.getHistData(exchange,secId,type);
+                    freshData = mboumDataService.getHistData(exchange,secId,type);
                     break;
             }
 
@@ -72,13 +81,31 @@ public class ExchangeActions {
                 }
             }).collect(Collectors.toList());
 
+            freshData =  new ArrayList<>();
+            DataPoint prev = null;
+            for(DataPoint dp : sortedData){
+                if((prev != null && dp.getUtcTimestamp() != prev.getUtcTimestamp()) && dp.getClose() > 0){
+                    freshData.add(dp);
+                    prev=dp;
+                }else if(prev == null && dp.getClose() > 0){
+                    freshData.add(dp);
+                    prev=dp;
+                }
+            }
+
             Map<String,List<DataPoint>> dbData = new HashMap<>();
-            dbData.put(today,sortedData);
+            dbData.put(today,freshData);
             baseDao.setDailySecData(exchange,secId,dbData);
-        }else{
-            sortedData = (List<DataPoint>) data.get(today);
+
+        return freshData;
+    }
+
+    public List<DataPoint> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+        List<DataPoint> data = getSecDataFromDb(exchange, secId, type);
+        if(data == null || data.isEmpty()){
+            data = getSecDataFromSource(exchange, secId, type);
         }
-        return sortedData;
+        return data;
     }
 
     @Cacheable(value = "secListCache")
@@ -124,38 +151,9 @@ public class ExchangeActions {
     }
 
     public void loadExchangeDataForSec(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
-        Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
-        List<DataPoint> sortedData = null;
-        List<DataPoint> freshData = null;
-        String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
-        if(data==null || !data.containsKey(today)){
-            switch(exchange){
-                case BSE_EXCHANGE:
-                    freshData = nasdaqService.getHistData(exchange,secId,type);
-                    break;
-                case NSE_EXCHANGE:
-                    freshData = nseDataService.getHistData(exchange,secId,type);
-                    break;
-            }
-
-            sortedData = freshData.stream().sorted(new Comparator<DataPoint>() {
-                @Override
-                public int compare(DataPoint o1, DataPoint o2) {
-                    try {
-                        Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(o1.getTime());
-                        Date date2 = new SimpleDateFormat("yyyy-MM-dd").parse(o2.getTime());
-
-                        return date1.compareTo(date2);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return 0;
-                }
-            }).collect(Collectors.toList());
-
-            Map<String,List<DataPoint>> dbData = new HashMap<>();
-            dbData.put(today,sortedData);
-            baseDao.setDailySecData(exchange,secId,dbData);
+        List<DataPoint> data = getSecDataFromDb(exchange, secId, type);
+        if(data == null || data.isEmpty()){
+            data = getSecDataFromSource(exchange, secId, type);
             Thread.sleep(20000);
         }
     }
