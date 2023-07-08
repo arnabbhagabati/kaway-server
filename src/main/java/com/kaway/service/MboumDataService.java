@@ -56,6 +56,13 @@ public class MboumDataService {
                     url =url+".NS";
                 }
                 break;
+            case "BSE":
+                if(type.equals(SecType.INDEX.toString())){
+                    //url = url+"&interval=1d&diffandsplits=true&apikey="+API_KEY;
+                }else{
+                    url =url+".BO";
+                }
+                break;
         }
 
         url = url+"&interval=1d&diffandsplits=true&apikey="+API_KEY;

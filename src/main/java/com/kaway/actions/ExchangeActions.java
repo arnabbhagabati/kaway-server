@@ -59,7 +59,7 @@ public class ExchangeActions {
 
             switch(exchange){
                 case BSE_EXCHANGE:
-                    freshData = nasdaqService.getHistData(exchange,secId,type);
+                    freshData = mboumDataService.getHistData(exchange,secId,type);
                     break;
                 case NSE_EXCHANGE:
                     freshData = mboumDataService.getHistData(exchange,secId,type);
@@ -108,7 +108,7 @@ public class ExchangeActions {
         return data;
     }
 
-    @Cacheable(value = "secListCache")
+    //@Cacheable(value = "secListCache")
     public List<Security> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException {
 
         List<Security> op = new ArrayList<>();
@@ -128,11 +128,12 @@ public class ExchangeActions {
             daysBetween = Duration.between(date1.atStartOfDay(), date2.atStartOfDay()).toDays();
         }
 
-        if (data == null || daysBetween > 7) {
+        if(true){
+        //if (data == null || daysBetween > 7) {
 
             switch (exchange) {
                 case BSE_EXCHANGE:
-                    op = nasdaqService.getSecList();
+                    op = bseService.getSecList();
                     break;
                 case NSE_EXCHANGE:
                     op = nseService.getSecList();

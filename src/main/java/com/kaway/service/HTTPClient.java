@@ -55,10 +55,17 @@ public class HTTPClient {
 
             String output;
             //System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
+
+            int BUFFER_SIZE=1024;
+            char[] buffer = new char[BUFFER_SIZE]; // or some other size,
+            int charsRead = 0;
+            while ( (charsRead  = br.read(buffer, 0, BUFFER_SIZE)) != -1) {
+                op.append(buffer, 0, charsRead);
+            }
+          /*  while ((output = br.readLine()) != null) {
                 //System.out.println(output);
                 op.append(output);
-            }
+            }*/
 
             conn.disconnect();
 

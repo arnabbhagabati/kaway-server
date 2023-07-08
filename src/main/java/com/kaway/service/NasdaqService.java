@@ -11,11 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
 
@@ -66,9 +63,6 @@ public class NasdaqService {
 
         List<DataPoint> op = new ArrayList<>();
 
-        Gson g = new Gson();
-
-        // Read a single attribute
         JsonObject rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("dataset");
         JsonArray columnList = rawJson.getAsJsonArray("column_names");
 
@@ -117,12 +111,14 @@ public class NasdaqService {
     }
 
 
-    public List<Security> getSecList() throws IOException {
+    /* Works with Nasdaq sec list API
+
+       public List<Security> getSecList() throws IOException {
         String zipFile = "BSESecList.zip";
         zipClient.getHTTPData("https://data.nasdaq.com/api/v3/databases/BSE/metadata?api_key="+API_KEY,zipFile);
         List<List<String>> records = fileUtil.readCsvFromZip(zipFile);
 
-        Map<String,Security> secFromBSe = bseService.getSecList();
+        Map<String,Security> secFromBSe = bseService.getSecMap();
         List<Security> op = new ArrayList<>();
 
         boolean header = true;
@@ -174,6 +170,6 @@ public class NasdaqService {
         }
         new File(zipFile).delete();
         return op;
-    }
+    }*/
 
 }
