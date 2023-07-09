@@ -104,8 +104,6 @@ public class BSEService {
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println(response.body());
-
             JsonArray dataArray = new JsonParser().parse(response.body())
                                             .getAsJsonObject()
                                             .getAsJsonObject("finance")

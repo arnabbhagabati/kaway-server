@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.kaway.main.KawayConstants.LSE_EXCHANGE;
 import static com.kaway.main.KawayConstants.US_DATE_FORMAT;
 
 @Component
@@ -63,9 +64,15 @@ public class MboumDataService {
                     url =url+".BO";
                 }
                 break;
+            case LSE_EXCHANGE:
+                if(type.equals(SecType.INDEX.toString())){
+                    //url = url+"&interval=1d&diffandsplits=true&apikey="+API_KEY;
+                }else{
+                    url =url+".L";
+                }
         }
 
-        url = url+"&interval=1d&diffandsplits=true&apikey="+API_KEY;
+        url = url+"&interval=1d&diffandsplits=true";
 
         String rawdata = client.getHTTPData(url);
         List<DataPoint> op = new ArrayList<>();

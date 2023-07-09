@@ -5,6 +5,7 @@ import com.kaway.actions.ExchangeActions;
 import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
+import com.kaway.service.NasdaqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -51,6 +52,9 @@ class KawayController {
   @Autowired
   ExchangeActions exchangeActions;
 
+  @Autowired
+  NasdaqService nasdaqService; // tmp
+
   @GetMapping("/")
   String hello() {
     return "Hello magga!";
@@ -72,6 +76,7 @@ class KawayController {
 
   @GetMapping("/loadData/{exchange}")
   String loadData(@PathVariable(value="exchange") String exchange,@RequestParam(name = "idxCode") String idxCode) throws IOException, ExecutionException, InterruptedException {
+    //nasdaqService.getIndicesList();
     Object secListData  = (Object) exchangeActions.getSecList(exchange);
     List<HashMap<String,Object>> secData = (List<HashMap<String,Object>>) secListData;
     for(HashMap<String,Object> secMap : secData){

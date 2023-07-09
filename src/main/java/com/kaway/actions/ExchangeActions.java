@@ -41,6 +41,12 @@ public class ExchangeActions {
     @Autowired
     NSEService nseService;
 
+    @Autowired
+    NYSEDataService nyseDataService;
+
+    @Autowired
+    LSEService lseService;
+
     public List<DataPoint> getSecDataFromDb(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
         Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
@@ -62,6 +68,15 @@ public class ExchangeActions {
                     freshData = mboumDataService.getHistData(exchange,secId,type);
                     break;
                 case NSE_EXCHANGE:
+                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    break;
+                case NASDAQ_EXCHANGE:
+                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    break;
+                case NYSE_EXCHANGE:
+                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    break;
+                case LSE_EXCHANGE:
                     freshData = mboumDataService.getHistData(exchange,secId,type);
                     break;
             }
@@ -112,6 +127,7 @@ public class ExchangeActions {
     public List<Security> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException {
 
         List<Security> op = new ArrayList<>();
+
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
         long daysBetween = 0;
         String dataDate = "";
@@ -119,6 +135,7 @@ public class ExchangeActions {
         Map<String, Object> data = baseDao.getSecList(exchange);
 
         if(data != null) {
+
             Map.Entry<String, Object> firstEntry = data.entrySet().iterator().next();
             dataDate = firstEntry.getKey();
 
@@ -126,10 +143,12 @@ public class ExchangeActions {
             LocalDate date1 = LocalDate.parse(dataDate, dtf);
             LocalDate date2 = LocalDate.parse(today, dtf);
             daysBetween = Duration.between(date1.atStartOfDay(), date2.atStartOfDay()).toDays();
+
+            op = (List<Security>) data.get(dataDate);
         }
 
-        if(true){
-        //if (data == null || daysBetween > 7) {
+        //if(true){
+        if (data == null || daysBetween > 7) {
 
             switch (exchange) {
                 case BSE_EXCHANGE:
@@ -137,6 +156,15 @@ public class ExchangeActions {
                     break;
                 case NSE_EXCHANGE:
                     op = nseService.getSecList();
+                    break;
+                case NASDAQ_EXCHANGE:
+                    op = nasdaqService.getSecList();
+                    break;
+                case NYSE_EXCHANGE:
+                    op = nyseDataService.getSecList();
+                    break;
+                case LSE_EXCHANGE:
+                    op = lseService.getSecList();
                     break;
             }
 

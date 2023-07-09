@@ -10,7 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -171,5 +180,105 @@ public class NasdaqService {
         new File(zipFile).delete();
         return op;
     }*/
+
+    public List<Security> getSecList() throws IOException {
+        List<Security> secList = new ArrayList<>();
+        //String url = "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true";
+
+        
+        URL url = new URL("https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true");
+        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        httpConn.setRequestMethod("GET");
+
+        httpConn.setRequestProperty("accept", "application/json, text/plain, */*");
+        httpConn.setRequestProperty("accept-language", "en-US,en;q=0.9");
+        httpConn.setRequestProperty("cache-control", "no-cache");
+        httpConn.setRequestProperty("dnt", "1");
+
+        httpConn.setRequestProperty("pragma", "no-cache");
+        //httpConn.setRequestProperty("referer", "https://www.nasdaq.com/");
+
+        httpConn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
+
+        InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+                ? httpConn.getInputStream()
+                : httpConn.getErrorStream();
+        Scanner s = new Scanner(responseStream).useDelimiter("\\A");
+        String response = s.hasNext() ? s.next() : "";
+        //System.out.println(response);
+
+        String rawdata = response;
+        JsonArray rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("data").getAsJsonArray("rows");
+        for(JsonElement data : rawJson){
+            JsonObject currData = (JsonObject)data;
+            Security security = new Security(currData.get("symbol").getAsString(), currData.get("symbol").getAsString(), currData.get("name").getAsString(), currData.get("symbol").getAsString(), SecType.STOCK);
+            secList.add(security);
+        }
+        //secList.addAll(getIndicesList(secMap));
+        return secList;
+
+    }
+
+
+
+    public List<Security> getIndicesList() throws IOException, InterruptedException {
+        List<Security> secList = new ArrayList<>();
+        int offset = 0;
+        int retrievedCnt = 0;
+        int total = 101;
+
+        JsonArray op = new JsonArray();
+
+        while(retrievedCnt<total) {
+            try {
+                URL url = new URL("https://query1.finance.yahoo.com/v1/finance/screener?crumb=qi1yBvvC.cQ&lang=en-US®ion=US&formatted=true&corsDomain=finance.yahoo.com");
+                HttpClient client = HttpClient.newHttpClient();
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("https://query1.finance.yahoo.com/v1/finance/screener?crumb=qi1yBvvC.cQ&lang=en-US&region=US&formatted=true&corsDomain=finance.yahoo.com"))
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"size\":100,\"offset\":"+offset+",\"sortField\":\"percentchange\",\"sortType\":\"DESC\",\"quoteType\":\"INDEX\",\"topOperator\":\"AND\",\"query\":{\"operator\":\"AND\",\"operands\":[{\"operator\":\"or\",\"operands\":[{\"operator\":\"EQ\",\"operands\":[\"region\",\"us\"]}]}]},\"userId\":\"SNODVZAKC7RFBBWPKMCNCAHT5I\",\"userIdType\":\"guid\"}"))
+                        .setHeader("accept", "*/*")
+                        .setHeader("accept-language", "en-US,en;q=0.9")
+                        .setHeader("cache-control", "no-cache")
+                        .setHeader("content-type", "application/json")
+                        .setHeader("cookie", "F=d=7ThV1MI9vODnSdDReVjIFGRHkO1ASSGI0UQLMMBLDm.5Tu4-; PH=l=en-IN; Y=v=1&n=0e6q35pekqga6&l=0hd01.1706010j8/o&p=m2mvvin00000000&r=o7&intl=in; B=97k1rg5gbea6q&b=4&d=nW7xH6dtYFrr0fb3zsRc&s=6r&i=lNXuquCoKh2be0PBrthy; tbla_id=cc419f2b-4268-4c03-b666-c249b8cfc65e-tuct7b0ae6c; gam_id=y-ujNf6dpG2uL5eJ1YRCOVchmN2Qytx4DOzPj7Q5vg609MzJNHzA---A; ucs=tr=1688403197000; OTH=v=2&s=2&d=eyJraWQiOiIwMTY0MGY5MDNhMjRlMWMxZjA5N2ViZGEyZDA5YjE5NmM5ZGUzZWQ5IiwiYWxnIjoiUlMyNTYifQ.eyJjdSI6eyJndWlkIjoiU05PRFZaQUtDN1JGQkJXUEtNQ05DQUhUNUkiLCJwZXJzaXN0ZW50Ijp0cnVlLCJzaWQiOiJYdlF5Nld1ZXJkZ0UifX0.bDhb2ztkJMpxqusFemMOkARq598IorFJizcHv2ct0xb2WSjN_idTp7L6KS_LyQ6IIQ3bUGb864ky77tDRWe5LYLOPoLZmTjoc-NvcT6II6Gy_GRAKUG_L5lKWuVcDXFL-fuKEgEEk2wm8fMGUe4CmNmt2nhJUKx2Tra72FtLQ7Q; T=af=JnRzPTE2ODgzMTY3OTgmcHM9SVlabTNyU0lhMHE1R1hSOG9lNnBrQS0t&d=bnMBeWFob28BZwFTTk9EVlpBS0M3UkZCQldQS01DTkNBSFQ1SQFhYwFBR0xkWmtPNQFhbAFhcm5hYi5iaGFnYWJhdGkBc2MBZGVza3RvcF93ZWIBZnMBRnRpSzlyOWd1R2Z3AXp6AUVnU2xrQmtRSQFhAVFBRQFsYXQBb3RGTmtCAW51ATA-&kt=EAAPyi5O5LDzy3Z9uKu41tthQ--~I&ku=FAAMYv.GvIQLtMEhFrYDQmFd4A7qM_BkSY0Op9FKNdoS.MZqxkC7RK49WHzkuFm7BZLNC_.6f65xZfqhUO3JjlZvH1u6F4wjfqAnaQuq7L.4pR5_yI8FHELgSEtn7dgdNp_24oWw1QbqC6NYPPwak4FdbNTItpqRERXFgxrwzNP9Bk-~E; GUC=AQEACAJkpStk1EIcngRR&s=AQAAAE8G8WXK&g=ZKPjkQ; A1=d=AQABBNoot2ACEKQu2sfzBbeu8trCK4E70JMFEgEACAIrpWTUZFkZyyMA_eMBAAcI2ii3YIE70JMID8LhGQly-uNloFX5qdvwIQkBBwoB1w&S=AQAAAq52IR8mN79pOHw5UundnNw; A3=d=AQABBNoot2ACEKQu2sfzBbeu8trCK4E70JMFEgEACAIrpWTUZFkZyyMA_eMBAAcI2ii3YIE70JMID8LhGQly-uNloFX5qdvwIQkBBwoB1w&S=AQAAAq52IR8mN79pOHw5UundnNw; A1S=d=AQABBNoot2ACEKQu2sfzBbeu8trCK4E70JMFEgEACAIrpWTUZFkZyyMA_eMBAAcI2ii3YIE70JMID8LhGQly-uNloFX5qdvwIQkBBwoB1w&S=AQAAAq52IR8mN79pOHw5UundnNw&j=WORLD; cmp=t=1688886122&j=0&u=1---; PRF=t%3D%255EIXIC%252B%255ENDX%252B%255EBSESN%252B%255ENSEI%252BINDEX%252BNTPC.NS%252BNTPC.BO%252BNSE.V%252BBAJAJFINSV.BO%252BBAJAJFINSV.NS%252BNIFTYMIDCAP150.NS%252B%255ECNX100%252BBAJAJELEC.NS%252BICICIINFRA.NS%252B%255ENFTS.REGA%26newChartbetateaser%3D1")
+                        .setHeader("dnt", "1")
+                        .setHeader("pragma", "no-cache")
+                        .setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+                        .build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                JsonObject res = new JsonParser().parse(response.body())
+                        .getAsJsonObject()
+                        .getAsJsonObject("finance")
+                        .getAsJsonArray("result")
+                        .get(0).getAsJsonObject();
+                total = res.get("total").getAsInt();
+
+                JsonArray dataArray = res
+                        .getAsJsonArray("quotes");
+
+                for (int i = 0; i < dataArray.size(); i++) {
+                    JsonObject data = dataArray.get(i).getAsJsonObject();
+                    JsonObject idx = new JsonObject();
+                    idx.addProperty("fullExchangeName",data.get("fullExchangeName").getAsString());
+                    idx.addProperty("symbol",data.get("symbol").getAsString());
+                    idx.addProperty("exchange",data.get("exchange").getAsString());
+                    idx.addProperty("shortName",data.get("shortName").getAsString());
+
+                    op.add(idx);
+
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            retrievedCnt =retrievedCnt+100;
+            offset = offset+100;
+
+        }
+        System.out.println(op);
+        return secList;
+    }
 
 }
