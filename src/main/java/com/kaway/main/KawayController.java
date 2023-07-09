@@ -61,10 +61,10 @@ class KawayController {
   }
 
   @GetMapping("/histData/{exchange}/{secId}")
-  List<DataPoint> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type) throws IOException, ExecutionException, InterruptedException {
+  Map<String,List<DataPoint>> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type,@RequestParam(name = "type") String days) throws IOException, ExecutionException, InterruptedException {
     //NasdaqService service = new NasdaqService();
     System.out.println("exchange="+exchange+" secId="+secId+" type ="+type);
-    List<DataPoint> data  = exchangeActions.getExchangeData(exchange,secId,type);
+    Map<String,List<DataPoint>> data  = exchangeActions.getExchangeData(exchange,secId,type);
     return data;
   }
 

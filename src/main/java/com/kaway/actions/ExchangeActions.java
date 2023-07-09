@@ -47,83 +47,86 @@ public class ExchangeActions {
     @Autowired
     LSEService lseService;
 
-    public List<DataPoint> getSecDataFromDb(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+    public Map<String,List<DataPoint>> getSecDataFromDb(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+        Map<String,List<DataPoint>> dataMap = new HashMap<>();
         Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
-        List<DataPoint> freshData = null;
+        String today_hh = new SimpleDateFormat(DEFAULT_DATE_FORMAT_HH).format(new Date());
         if(data!=null && data.containsKey(today)){
-            freshData = (List<DataPoint>) data.get(today);
+            dataMap.put(today,(List<DataPoint>) data.get(today));
         }
-        return freshData;
+        if(data!=null && data.containsKey(today_hh)){
+            dataMap.put(today_hh,(List<DataPoint>) data.get(today_hh));
+        }
+        return dataMap;
     }
 
-    public List<DataPoint> getSecDataFromSource(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
-        List<DataPoint> sortedData = null;
-        List<DataPoint> freshData = null;
-        String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
+    public List<DataPoint> getSecHistDataFromSource(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+        List<DataPoint> histData = null;
 
+        String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
 
             switch(exchange){
                 case BSE_EXCHANGE:
-                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    histData = mboumDataService.getHistData(exchange,secId,type);
                     break;
                 case NSE_EXCHANGE:
-                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    histData = mboumDataService.getHistData(exchange,secId,type);
                     break;
                 case NASDAQ_EXCHANGE:
-                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    histData = mboumDataService.getHistData(exchange,secId,type);
                     break;
                 case NYSE_EXCHANGE:
-                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    histData = mboumDataService.getHistData(exchange,secId,type);
                     break;
                 case LSE_EXCHANGE:
-                    freshData = mboumDataService.getHistData(exchange,secId,type);
+                    histData = mboumDataService.getHistData(exchange,secId,type);
                     break;
-            }
-
-            sortedData = freshData.stream().sorted(new Comparator<DataPoint>() {
-                @Override
-                public int compare(DataPoint o1, DataPoint o2) {
-                    try {
-                        Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(o1.getTime());
-                        Date date2 = new SimpleDateFormat("yyyy-MM-dd").parse(o2.getTime());
-
-                        return date1.compareTo(date2);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return 0;
-                }
-            }).collect(Collectors.toList());
-
-            freshData =  new ArrayList<>();
-            DataPoint prev = null;
-            for(DataPoint dp : sortedData){
-                if((prev != null && dp.getUtcTimestamp() != prev.getUtcTimestamp()) && dp.getClose() > 0){
-                    freshData.add(dp);
-                    prev=dp;
-                }else if(prev == null && dp.getClose() > 0){
-                    freshData.add(dp);
-                    prev=dp;
-                }
             }
 
             Map<String,List<DataPoint>> dbData = new HashMap<>();
-            dbData.put(today,freshData);
-            baseDao.setDailySecData(exchange,secId,dbData);
+            dbData.put(today,histData);
+            //baseDao.setDailySecData(exchange,secId,dbData);
 
-        return freshData;
+        return histData;
     }
 
-    public List<DataPoint> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
-        List<DataPoint> data = getSecDataFromDb(exchange, secId, type);
-        if(data == null || data.isEmpty()){
-            data = getSecDataFromSource(exchange, secId, type);
+    public List<DataPoint> getSec15mDataFromSource(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+        List<DataPoint> fifteenMinData = null;
+
+        String today_hh = new SimpleDateFormat(DEFAULT_DATE_FORMAT_HH).format(new Date());
+
+        fifteenMinData = mboumDataService.get15mData(exchange,secId,type);
+
+        Map<String,List<DataPoint>> dbData = new HashMap<>();
+        dbData.put(today_hh,fifteenMinData);
+        //baseDao.setDailySecData(exchange,secId,dbData);
+
+        return fifteenMinData;
+    }
+
+    public  Map<String,List<DataPoint>> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+        Map<String,List<DataPoint>> dbData = getSecDataFromDb(exchange, secId, type);
+        Map<String,List<DataPoint>> retData = getSecDataFromDb(exchange, secId, type);
+        String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
+        String today_hh = new SimpleDateFormat(DEFAULT_DATE_FORMAT_HH).format(new Date());
+
+        if(dbData == null || !dbData.containsKey(today)){
+            List<DataPoint> histData = getSecHistDataFromSource(exchange, secId, type);
+            dbData.put(today,histData);
+            retData.put(ONE_DAY,histData);
         }
-        return data;
+
+        if(dbData == null || !dbData.containsKey(today_hh)){
+            List<DataPoint> data15min = getSec15mDataFromSource(exchange, secId, type);
+            dbData.put(today_hh,data15min);
+            retData.put(FIFTEEN_MIN,data15min);
+        }
+        baseDao.setDailySecData(exchange,secId,dbData);
+        return retData;
     }
 
-    //@Cacheable(value = "secListCache")
+    @Cacheable(value = "secListCache")
     public List<Security> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException {
 
         List<Security> op = new ArrayList<>();
@@ -180,11 +183,21 @@ public class ExchangeActions {
     }
 
     public void loadExchangeDataForSec(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
-        List<DataPoint> data = getSecDataFromDb(exchange, secId, type);
-        if(data == null || data.isEmpty()){
-            data = getSecDataFromSource(exchange, secId, type);
-            Thread.sleep(20000);
+
+        Map<String,List<DataPoint>> dbData = getSecDataFromDb(exchange, secId, type);
+
+        if(dbData == null || !dbData.containsKey(ONE_DAY)){
+            List<DataPoint> histData = getSecHistDataFromSource(exchange, secId, type);
+            dbData.put(ONE_DAY,histData);
+            Thread.sleep(10000);
         }
+
+        if(dbData == null || !dbData.containsKey(FIFTEEN_MIN)){
+            List<DataPoint> data15min = getSec15mDataFromSource(exchange, secId, type);
+            dbData.put(FIFTEEN_MIN,data15min);
+            Thread.sleep(10000);
+        }
+
     }
 
 }
