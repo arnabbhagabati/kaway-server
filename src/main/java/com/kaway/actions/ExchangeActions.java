@@ -107,21 +107,22 @@ public class ExchangeActions {
 
     public  Map<String,List<DataPoint>> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
         Map<String,List<DataPoint>> dbData = getSecDataFromDb(exchange, secId, type);
-        Map<String,List<DataPoint>> retData = getSecDataFromDb(exchange, secId, type);
+        Map<String,List<DataPoint>> retData = new HashMap<>();
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
         String today_hh = new SimpleDateFormat(DEFAULT_DATE_FORMAT_HH).format(new Date());
 
         if(dbData == null || !dbData.containsKey(today)){
             List<DataPoint> histData = getSecHistDataFromSource(exchange, secId, type);
             dbData.put(today,histData);
-            retData.put(ONE_DAY,histData);
         }
 
         if(dbData == null || !dbData.containsKey(today_hh)){
             List<DataPoint> data15min = getSec15mDataFromSource(exchange, secId, type);
             dbData.put(today_hh,data15min);
-            retData.put(FIFTEEN_MIN,data15min);
         }
+
+        retData.put(ONE_DAY,dbData.get(today));
+        retData.put(FIFTEEN_MIN,dbData.get(today_hh));
         baseDao.setDailySecData(exchange,secId,dbData);
         return retData;
     }
