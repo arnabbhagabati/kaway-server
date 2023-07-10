@@ -29,7 +29,7 @@ public class MboumDataService {
     HTTPClient client;
 
     private static String NSE_HIST_DATA_BASE = "https://mboum.com/api/v1/hi/history/?symbol=";
-    private static int GAP_BETWEEN_CALLS = 5000;
+    private static int GAP_BETWEEN_CALLS = 2000;
     private static AtomicLong LAST_CALL_TIME = new AtomicLong(System.currentTimeMillis());
     private static final DecimalFormat df = new DecimalFormat("0.00");
 

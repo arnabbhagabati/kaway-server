@@ -211,7 +211,7 @@ public class NasdaqService {
         JsonArray rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("data").getAsJsonArray("rows");
         for(JsonElement data : rawJson){
             JsonObject currData = (JsonObject)data;
-            Security security = new Security(currData.get("symbol").getAsString(), currData.get("symbol").getAsString(), currData.get("name").getAsString(), currData.get("symbol").getAsString(), SecType.STOCK);
+            Security security = new Security(currData.get("symbol").getAsString(), currData.get("symbol").getAsString(), currData.get("name").getAsString().replaceFirst(" Common Stock",""), currData.get("symbol").getAsString(), SecType.STOCK);
             secList.add(security);
         }
         //secList.addAll(getIndicesList(secMap));

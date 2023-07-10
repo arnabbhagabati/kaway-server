@@ -49,14 +49,16 @@ public class ExchangeActions {
 
     public Map<String,List<DataPoint>> getSecDataFromDb(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
         Map<String,List<DataPoint>> dataMap = new HashMap<>();
-        Map<String, Object> data = baseDao.getDailySecData(exchange,secId);
+        Map<String, Object> dailyData = baseDao.getDailySecData(exchange,secId+"_"+ONE_DAY);
+        Map<String, Object> fifData = baseDao.getDailySecData(exchange,secId+"_"+FIFTEEN_MIN);
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
         String today_hh = new SimpleDateFormat(DEFAULT_DATE_FORMAT_HH).format(new Date());
-        if(data!=null && data.containsKey(today)){
-            dataMap.put(today,(List<DataPoint>) data.get(today));
+
+        if(dailyData!=null && dailyData.containsKey(today)){
+            dataMap.put(today,(List<DataPoint>) dailyData.get(today));
         }
-        if(data!=null && data.containsKey(today_hh)){
-            dataMap.put(today_hh,(List<DataPoint>) data.get(today_hh));
+        if(fifData!=null && fifData.containsKey(today_hh)){
+            dataMap.put(today_hh,(List<DataPoint>) fifData.get(today_hh));
         }
         return dataMap;
     }
@@ -114,16 +116,22 @@ public class ExchangeActions {
         if(dbData == null || !dbData.containsKey(today)){
             List<DataPoint> histData = getSecHistDataFromSource(exchange, secId, type);
             dbData.put(today,histData);
+            Map<String,List<DataPoint>> freshData = new HashMap<>();
+            freshData.put(today,histData);
+            baseDao.setDailySecData(exchange,secId+"_"+ONE_DAY,freshData);
         }
 
         if(dbData == null || !dbData.containsKey(today_hh)){
             List<DataPoint> data15min = getSec15mDataFromSource(exchange, secId, type);
             dbData.put(today_hh,data15min);
+            Map<String,List<DataPoint>> freshData = new HashMap<>();
+            freshData.put(today_hh,data15min);
+            baseDao.setDailySecData(exchange,secId+"_"+FIFTEEN_MIN,freshData);
         }
 
         retData.put(ONE_DAY,dbData.get(today));
         retData.put(FIFTEEN_MIN,dbData.get(today_hh));
-        baseDao.setDailySecData(exchange,secId,dbData);
+
         return retData;
     }
 
@@ -184,19 +192,19 @@ public class ExchangeActions {
     }
 
     public void loadExchangeDataForSec(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
-
+        //copy from getExchangeData when ready
         Map<String,List<DataPoint>> dbData = getSecDataFromDb(exchange, secId, type);
 
         if(dbData == null || !dbData.containsKey(ONE_DAY)){
             List<DataPoint> histData = getSecHistDataFromSource(exchange, secId, type);
             dbData.put(ONE_DAY,histData);
-            Thread.sleep(10000);
+            Thread.sleep(5000);
         }
 
         if(dbData == null || !dbData.containsKey(FIFTEEN_MIN)){
             List<DataPoint> data15min = getSec15mDataFromSource(exchange, secId, type);
             dbData.put(FIFTEEN_MIN,data15min);
-            Thread.sleep(10000);
+            Thread.sleep(5000);
         }
 
     }
