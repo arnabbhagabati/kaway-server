@@ -88,10 +88,10 @@ public class BaseDAO {
         return null;
     }
 
-    public void saveDashboard(String uid, String email, Dashboards dashboards) throws IOException{
+    public void saveDashboard(String uid, String email, Map<String,Dashboard> data) throws IOException{
         // Add a new document (asynchronously) in collection "cities" with id "LA"
         String key=email+"_"+uid;
-        ApiFuture<WriteResult> future = fireStoreConfig.dbContainer().db.collection(USER_COLLECTION).document(key).set(dashboards);
+        ApiFuture<WriteResult> future = fireStoreConfig.dbContainer().db.collection(USER_COLLECTION).document(key).set(data);
     }
 
     public void deleteDashboard(String uid, String email, String dashboard) throws IOException, ExecutionException, InterruptedException {

@@ -16,7 +16,9 @@ import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static com.kaway.main.KawayConstants.SUCCESS;
 
@@ -46,7 +48,8 @@ public class DashboardActions {
         String valMsg = validateUser(userToken,userId);
         List<Dashboard> dashboards = new ArrayList<>();
         if(valMsg.equals(SUCCESS)) {
-            dashboards =  dashboardService.getDashboards(userId, email);
+            Map<String,Dashboard>  dashboardsMap =  dashboardService.getDashboards(userId, email);
+            dashboards =  dashboardsMap.values().stream().collect(Collectors.toList());
         }
         return dashboards;
     }

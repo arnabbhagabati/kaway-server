@@ -108,12 +108,11 @@ class KawayController {
     return dashboardActions.saveDashBoard(dashboard,userToken,uid,email);
   }
 
-  @DeleteMapping("/users/{userEmail}/dashboard")
+  @DeleteMapping("/users/{userEmail}/{dashboard}")
   public String deleteDashboard(@PathVariable(value="userEmail") String email,
-                           @RequestParam (name = "dashboardName") String dashboardName,
+                           @PathVariable (name = "dashboard") String dashboardName,
                            @RequestParam(name = "uid") String uid,
                            @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
-    //System.out.println(dashboard);
     return dashboardActions.deleteDashboard(userToken,uid,email,dashboardName);
   }
 
@@ -122,7 +121,6 @@ class KawayController {
   public List<Dashboard> getDashboards(@PathVariable(value="userEmail") String email,
                                        @RequestParam(name = "uid") String uid,
                                        @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
-    //System.out.println(dashboard);
     return dashboardActions.getDashboards(userToken,uid,email);
   }
 

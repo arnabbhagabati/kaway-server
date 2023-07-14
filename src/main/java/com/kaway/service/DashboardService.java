@@ -32,15 +32,12 @@ public class DashboardService {
         String retMessage = "Dashboard saved successfully";
 
         try {
-            Map<String,Object> dashboardsMap = baseDao.getUserDashboards(userId,email);
             String validationMsg = "Error Saving dashboard";
-            List<Dashboard> dashboardList =  getDashboards(userId,email);
-            validationMsg = validateNewDashboard(dashboard,userId,email,dashboardList);
+            Map<String,Dashboard> existingDashboardMap =  getDashboards(userId,email);
+            validationMsg = validateNewDashboard(dashboard,userId,email,existingDashboardMap);
             if(validationMsg.equals(SUCCESS)){
-                    dashboardList.add(dashboard);
-                    Dashboards dashboardsOb = new Dashboards();
-                    dashboardsOb.setDashboards(dashboardList);
-                    baseDao.saveDashboard(userId, email, dashboardsOb);
+                    existingDashboardMap.put(dashboard.getName(),dashboard);
+                    baseDao.saveDashboard(userId, email, existingDashboardMap);
             }else{
                 return retMessage;
             }
@@ -57,35 +54,38 @@ public class DashboardService {
         baseDao.deleteDashboard(userId,email,dashboardName);
     }
 
-    public List<Dashboard> getDashboards(String userId,String email) throws IOException, ExecutionException, InterruptedException {
+    public Map<String,Dashboard> getDashboards(String userId,String email) throws IOException, ExecutionException, InterruptedException {
+        Map<String,Dashboard> op = new HashMap<>();
         Map<String,Object> dashboardsMap = baseDao.getUserDashboards(userId,email);
         List<Dashboard> dashboardList =  new ArrayList<>();
         if(dashboardsMap != null && !dashboardsMap.isEmpty()){
-            List<Map<String,Object>> listofDbMaps = (List<Map<String,Object>>) dashboardsMap.get(DASHBORADS);
-            for(Map<String,Object> dashMap : listofDbMaps){
-                String name = (String) dashMap.get("name");
-                List<Security> secList =  (List<Security>) dashMap.get("securityList");
+            //List<Map<String,Object>> listofDbMaps = (List<Map<String,Object>>) dashboardsMap.get(DASHBORADS);
+            for(Map.Entry<String,Object> e: dashboardsMap.entrySet()){
+                String name = (String) e.getKey();
+                Map<String,Object> map = (Map<String,Object>) e.getValue();
+                List<Security> secList = (List<Security>) map.get("securityList");
                 Dashboard db = new Dashboard(name,secList);
-                dashboardList.add(db);
+                op.put(name,db);
             }
         }
-        return dashboardList;
+        return op;
     }
 
 
-    private String validateNewDashboard(Dashboard newDashboard, String uid, String email,List<Dashboard> dashboardList) throws IOException, ExecutionException, InterruptedException {
+    private String validateNewDashboard(Dashboard newDashboard, String uid, String email,Map<String,Dashboard> existingDashboardMap) throws IOException, ExecutionException, InterruptedException {
 
         if(newDashboard.getSecurityList().size() >100){
             return "Cannot save a dashboard with more than 100 symbols";
         }
 
-        if(dashboardList != null && !dashboardList.isEmpty()) {
-            if (dashboardList.size() == 10) {
+        if(existingDashboardMap != null && !existingDashboardMap.isEmpty()) {
+            if (existingDashboardMap.size() == 10) {
                 return "Maximun limit for dashboard reached! Can only save up to 10 Dashboards per user!";
             }
 
-            for (Dashboard dashbrd : dashboardList) {
-                if (dashbrd.getName().equals(newDashboard.getName())) {
+            for (Map.Entry<String,Dashboard> e : existingDashboardMap.entrySet()) {
+                String name = e.getKey();
+                if (name.equals(newDashboard.getName())) {
                     return "Dashboard with same name exists!";
                 }
             }
