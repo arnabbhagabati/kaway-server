@@ -1,6 +1,7 @@
 package com.kaway.db;
 
 import com.google.cloud.firestore.FirestoreOptions;
+import com.google.firebase.FirebaseApp;
 import com.kaway.main.KawayConstants;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;

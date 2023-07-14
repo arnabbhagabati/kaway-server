@@ -10,7 +10,9 @@ public class Security implements Serializable {
     private String displayName;
     private SecType type;
     private List<String> constituents;
+    private String exchange;
 
+    //Todo add exchange in constructor
     public Security(String id, String code, String name, String displayName, SecType type) {
         this.id = id;
         this.code = code;
@@ -65,5 +67,13 @@ public class Security implements Serializable {
 
     public void setConstituents(List<String> constituents) {
         this.constituents = constituents;
+    }
+
+    public String getExchange() {
+        return exchange;
+    }
+
+    public void setExchange(String exchange) {
+        this.exchange = exchange;
     }
 }

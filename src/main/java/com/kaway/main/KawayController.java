@@ -1,7 +1,10 @@
 package com.kaway.main;
 
 
+import com.google.firebase.auth.FirebaseAuthException;
+import com.kaway.actions.DashboardActions;
 import com.kaway.actions.ExchangeActions;
+import com.kaway.beans.Dashboard;
 import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +59,9 @@ class KawayController {
   @Autowired
   NasdaqService nasdaqService; // tmp
 
+  @Autowired
+  DashboardActions dashboardActions;
+
   @GetMapping("/")
   String hello() {
     return "Hello magga!";
@@ -90,6 +97,33 @@ class KawayController {
         }
     }
     return "Completed";
+  }
+
+  @PostMapping("/users/{userEmail}/dashboard")
+  public String addDashboard(@PathVariable(value="userEmail") String email,
+                            @RequestBody Dashboard dashboard,
+                            @RequestParam(name = "uid") String uid,
+                            @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException {
+    //System.out.println(dashboard);
+    return dashboardActions.saveDashBoard(dashboard,userToken,uid,email);
+  }
+
+  @DeleteMapping("/users/{userEmail}/dashboard")
+  public String deleteDashboard(@PathVariable(value="userEmail") String email,
+                           @RequestParam (name = "dashboardName") String dashboardName,
+                           @RequestParam(name = "uid") String uid,
+                           @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+    //System.out.println(dashboard);
+    return dashboardActions.deleteDashboard(userToken,uid,email,dashboardName);
+  }
+
+
+  @GetMapping("/users/{userEmail}/dashboards")
+  public List<Dashboard> getDashboards(@PathVariable(value="userEmail") String email,
+                                       @RequestParam(name = "uid") String uid,
+                                       @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+    //System.out.println(dashboard);
+    return dashboardActions.getDashboards(userToken,uid,email);
   }
 
 }

@@ -17,4 +17,8 @@ public class KawayConstants {
     public static final String ONE_DAY = "oneDay";
     public static final String FIFTEEN_MIN = "fifMin";
 
+    public static final String USER_COLLECTION ="USERS";
+    public static final String SUCCESS ="SUCCESS";
+    public static final String DASHBORADS ="dashboards";
+
 }
