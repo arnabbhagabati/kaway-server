@@ -200,18 +200,11 @@ public class ExchangeActions {
 
     public void loadExchangeDataForSec(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
         //copy from getExchangeData when ready
-        Map<String,List<DataPoint>> dbData = getSecDataFromDb(exchange, secId, type);
-
-        if(dbData == null || !dbData.containsKey(ONE_DAY)){
-            List<DataPoint> histData = getSecHistDataFromSource(exchange, secId, type);
-            dbData.put(ONE_DAY,histData);
-            Thread.sleep(5000);
-        }
-
-        if(dbData == null || !dbData.containsKey(FIFTEEN_MIN)){
-            List<DataPoint> data15min = getSec15mDataFromSource(exchange, secId, type);
-            dbData.put(FIFTEEN_MIN,data15min);
-            Thread.sleep(5000);
+        try {
+            getExchangeData(exchange, secId, type);
+            Thread.sleep(2000);
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
     }
