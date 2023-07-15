@@ -2,12 +2,23 @@ package com.kaway.beans;
 
 public class DataPoint {
     private String time;
+    private Long utcTimestamp;
     private float open;
     private float close;
     private float high;
     private float low;
     private int volume;
 
+
+    public DataPoint(String time,Long utcTimestamp, float open, float close, float high, float low, int volume) {
+        this.time = time;
+        this.utcTimestamp=utcTimestamp;
+        this.open = open;
+        this.close = close;
+        this.high = high;
+        this.low = low;
+        this.volume = volume;
+    }
 
     public DataPoint(String time, float open, float close, float high, float low, int volume) {
         this.time = time;
@@ -64,5 +75,13 @@ public class DataPoint {
 
     public void setVolume(int volume) {
         this.volume = volume;
+    }
+
+    public Long getUtcTimestamp() {
+        return utcTimestamp;
+    }
+
+    public void setUtcTimestamp(Long utcTimestamp) {
+        this.utcTimestamp = utcTimestamp;
     }
 }

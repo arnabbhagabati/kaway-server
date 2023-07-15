@@ -4,17 +4,29 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Security implements Serializable {
-    private String code;
     private String id;
+    private String code;
     private String name;
+    private String displayName;
     private SecType type;
     private List<String> constituents;
+    private String exchange;
 
-    public Security(String code, String id, String name,SecType type) {
-        this.code = code;
+    //Todo add exchange in constructor
+    public Security(String id, String code, String name, String displayName, SecType type) {
         this.id = id;
+        this.code = code;
         this.name = name;
+        this.displayName = displayName;
         this.type = type;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getCode() {
@@ -55,5 +67,13 @@ public class Security implements Serializable {
 
     public void setConstituents(List<String> constituents) {
         this.constituents = constituents;
+    }
+
+    public String getExchange() {
+        return exchange;
+    }
+
+    public void setExchange(String exchange) {
+        this.exchange = exchange;
     }
 }

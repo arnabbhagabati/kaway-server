@@ -16,6 +16,8 @@ import java.net.URLEncoder;
 @Component
 public class HTTPClient {
 
+    private static String M_API_KEY = "YpChip3KKgvcSmkSCqPRHquVfuH5qdBQzZb5aldJGogr3CGQfFP10UVkWOx2";
+
     public String getHTTPData(String endpoint){
         StringBuilder op = new StringBuilder();
         System.out.println("HTTP call with URL "+endpoint+ " at "+System.currentTimeMillis());
@@ -44,6 +46,7 @@ public class HTTPClient {
 
             //conn.setRequestProperty("Content-Type", "application/json; utf-8");  // Note - yahho fin api does not work with utf 8
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
+            conn.setRequestProperty("X-Mboum-Secret",M_API_KEY);
 
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
@@ -55,10 +58,17 @@ public class HTTPClient {
 
             String output;
             //System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
+
+            int BUFFER_SIZE=1024;
+            char[] buffer = new char[BUFFER_SIZE]; // or some other size,
+            int charsRead = 0;
+            while ( (charsRead  = br.read(buffer, 0, BUFFER_SIZE)) != -1) {
+                op.append(buffer, 0, charsRead);
+            }
+          /*  while ((output = br.readLine()) != null) {
                 //System.out.println(output);
                 op.append(output);
-            }
+            }*/
 
             conn.disconnect();
 

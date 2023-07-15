@@ -1,10 +1,14 @@
 package com.kaway.main;
 
 
+import com.google.firebase.auth.FirebaseAuthException;
+import com.kaway.actions.DashboardActions;
 import com.kaway.actions.ExchangeActions;
+import com.kaway.beans.Dashboard;
 import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
+import com.kaway.service.NasdaqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -51,16 +56,22 @@ class KawayController {
   @Autowired
   ExchangeActions exchangeActions;
 
+  @Autowired
+  NasdaqService nasdaqService; // tmp
+
+  @Autowired
+  DashboardActions dashboardActions;
+
   @GetMapping("/")
   String hello() {
     return "Hello magga!";
   }
 
   @GetMapping("/histData/{exchange}/{secId}")
-  List<DataPoint> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type) throws IOException, ExecutionException, InterruptedException {
+  Map<String,List<DataPoint>> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type,@RequestParam(name = "type") String days) throws IOException, ExecutionException, InterruptedException {
     //NasdaqService service = new NasdaqService();
     System.out.println("exchange="+exchange+" secId="+secId+" type ="+type);
-    List<DataPoint> data  = exchangeActions.getExchangeData(exchange,secId,type);
+    Map<String,List<DataPoint>> data  = exchangeActions.getExchangeData(exchange,secId,type);
     return data;
   }
 
@@ -72,6 +83,7 @@ class KawayController {
 
   @GetMapping("/loadData/{exchange}")
   String loadData(@PathVariable(value="exchange") String exchange,@RequestParam(name = "idxCode") String idxCode) throws IOException, ExecutionException, InterruptedException {
+    //nasdaqService.getIndicesList();
     Object secListData  = (Object) exchangeActions.getSecList(exchange);
     List<HashMap<String,Object>> secData = (List<HashMap<String,Object>>) secListData;
     for(HashMap<String,Object> secMap : secData){
@@ -85,6 +97,31 @@ class KawayController {
         }
     }
     return "Completed";
+  }
+
+  @PostMapping("/users/{userEmail}/dashboard")
+  public String addDashboard(@PathVariable(value="userEmail") String email,
+                            @RequestBody Dashboard dashboard,
+                            @RequestParam(name = "uid") String uid,
+                            @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException {
+    //System.out.println(dashboard);
+    return dashboardActions.saveDashBoard(dashboard,userToken,uid,email);
+  }
+
+  @DeleteMapping("/users/{userEmail}/{dashboard}")
+  public String deleteDashboard(@PathVariable(value="userEmail") String email,
+                           @PathVariable (name = "dashboard") String dashboardName,
+                           @RequestParam(name = "uid") String uid,
+                           @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+    return dashboardActions.deleteDashboard(userToken,uid,email,dashboardName);
+  }
+
+
+  @GetMapping("/users/{userEmail}/dashboards")
+  public List<Dashboard> getDashboards(@PathVariable(value="userEmail") String email,
+                                       @RequestParam(name = "uid") String uid,
+                                       @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+    return dashboardActions.getDashboards(userToken,uid,email);
   }
 
 }
