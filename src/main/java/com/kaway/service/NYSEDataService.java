@@ -6,21 +6,26 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
+import com.kaway.util.FileUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
+import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
+
 @Service
 public class NYSEDataService {
+
+    @Autowired
+    FileUtil fileUtil;
 
     public List<Security> getSecList() throws IOException {
 
@@ -63,7 +68,45 @@ public class NYSEDataService {
             secList.add(security);
         }
 
+        secList.addAll(getIndices());
+
         return secList;
 
+    }
+
+
+    private List<Security> getIndices() throws FileNotFoundException {
+
+        List<Security> list = new ArrayList<>();
+        /*String url = "https://www.ice.com/publicdocs/data/NYSE_Equity_Index_Ticker_List.xlsx";
+        List<String> rawdata = csvHttp.getHTTPData(url);
+
+        int cnt = 0;
+        for(String s : rawdata){
+            String[] fields = s.split(",");
+            if(cnt>0){
+                list.add(new Security("^"+fields[0],"^"+fields[0],fields[1], fields[1],SecType.INDEX));
+            }
+            cnt++;
+        }*/
+
+
+        // Todo : Remove hard code, get from https://www.ice.com/publicdocs/data/NYSE_Equity_Index_Ticker_List.xlsx
+        //  or https://www.ice.com/market-data/indices/equity-indices/products other online
+        File f = new File("src/main/resources/NYSE_INDICES.csv");
+        if(f.exists() && !f.isDirectory()) {
+            List<List<String>> constituentSecs = fileUtil.getCsvRecords(f);
+            List<String> constituents = new ArrayList<>();
+            int cnt =0;
+            for(List<String> consSec : constituentSecs){
+                if(cnt>0) {
+                    Security sec = new Security("^" + consSec.get(0), "^" + consSec.get(0), consSec.get(1), consSec.get(1).replaceFirst("NYSE ",""), SecType.INDEX);
+                    list.add(sec);
+                }
+                cnt++;
+            }
+        }
+
+        return list;
     }
 }

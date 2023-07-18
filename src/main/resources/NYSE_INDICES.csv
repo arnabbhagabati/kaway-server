@@ -1,0 +1,50 @@
+﻿Symbol,Name
+NYSECL,NYSE Collar Index (PR)
+NYSECLT,NYSE Collar Index (TR)
+NYA,NYSE Composite Index
+NYATR,NYSE Composite Index (TR)
+NYA.MN,NYSE Composite Mini-Index
+NYUSDA,NYSE Dynamic U.S. Allocation Index
+NYBW,NYSE Dynamic US Large Cap Buy-Write Index
+NYE.ID,NYSE Energy Sector Index
+NYETR,NYSE Energy Sector Index (TR)
+NYXLEW,NYSE Equal Sector Weight Index
+NYXLEWTR,NYSE Equal Sector Weight Index (TR)
+NYFANG,NYSE FANG+ Index
+NYFANGNT,NYSE FANG+ Index (NTR)
+NYFANGT,NYSE FANG+ Index (TR)
+FANGST,NYSE FANG+ Index Daily Opening Settlement Value
+NYFANGST,NYSE FANG+ Index Settlement Value
+NYFANGJT,NYSE FANG+ Index TR (JPY)
+NYFANGJ,NYSE FANG+ Index(JPY)
+NYK,NYSE Financial Sector Index
+NYKTR,NYSE Financial Sector Index (TR)
+NYP,NYSE Health Care Sector Index
+NYPTR,NYSE Health Care Sector Index (TR)
+NYI,NYSE International 100 Index
+NYITR,NYSE International 100 Index (TR)
+NYI-MN,NYSE International 100 Mini-Index
+NYINOV8,NYSE R&D Innovation Index
+NYINOV8T,NYSE R&D Innovation Index Total Return
+NYTAB,NYSE TAB+ Index
+NYTABT,NYSE TAB+ Index (USD Gross TR)
+NYTABN,NYSE TAB+ Index (USD Net TR)
+NYTECH,NYSE Technology Index
+MVH,NYSE Technology Index (Settlement Value)
+NYTECHTR,NYSE Technology Index TR
+NYY,NYSE TMT Index
+NYYTR,NYSE TMT Index (TR)
+NYY-MN,NYSE TMT Mini-Index
+NY,NYSE U.S. 100 Index
+NYTR,NYSE U.S. 100 Index (TR)
+NY-MN,NYSE U.S. 100 Mini-Index
+NYLGCAP,NYSE U.S. Large Cap Equal Weight Index
+NYLGCAPT,NYSE U.S. Large Cap Equal Weight Index (Total Return)
+NYL,NYSE World Leaders Index
+NYLTR,NYSE World Leaders Index (TR)
+NYL,NYSE World Leaders Mini-Index
+NYSEYCL,NYSE Yield Collar Index (PR)
+NYSEYCLT,NYSE Yield Collar Index (TR)
+TWSHD30,ICE Taiwan ESG Sustainability High Dividend Select Top 30 Price Return Index
+TWSHD30T,ICE Taiwan ESG Sustainability High Dividend Select Top 30 Total Return Index
+^XAX,AMEX COMPOSITE INDEX
