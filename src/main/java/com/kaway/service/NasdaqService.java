@@ -263,7 +263,7 @@ public class NasdaqService {
                     }
 
                 }
-                Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" Constituents",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
+                Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
                 allSec.setConstituents(constituents);
                 allSecs.add(allSec);
             }

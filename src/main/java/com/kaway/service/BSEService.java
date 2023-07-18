@@ -125,8 +125,8 @@ public class BSEService {
                     List<List<String>> constituentSecs = fileUtil.getCsvRecords(f);
                     List<String> constituents = new ArrayList<>();
                     for(List<String> consSec : constituentSecs){
-                        if(consSec.get(0).startsWith("Scrip")) continue;
-                        if(secMap.containsKey(consSec.get(0))) constituents.add(secMap.get(consSec.get(0)).getCode());
+                        if(consSec.get(0).startsWith("Ticker")) continue;
+                        if(secMap.containsKey(consSec.get(0))) constituents.add(secMap.get(consSec.get(0)).getId());
                     }
                     Security allSec = new Security(security.getCode()+"_ALL",
                                                     security.getCode()+"_ALL",

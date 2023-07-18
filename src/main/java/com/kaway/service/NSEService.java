@@ -104,7 +104,7 @@ public class NSEService {
                     }
 
                 }
-                Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" ALL", SecType.INDEX_ALL);
+                Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
                 allSec.setConstituents(constituents);
                 allSecs.add(allSec);
             }
