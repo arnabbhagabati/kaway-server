@@ -202,7 +202,7 @@ public class ExchangeActions {
         //copy from getExchangeData when ready
         try {
             getExchangeData(exchange, secId, type);
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         }catch(Exception e){
             e.printStackTrace();
         }
