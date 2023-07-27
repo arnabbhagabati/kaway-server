@@ -167,7 +167,7 @@ public class ExchangeActions {
         }
 
         //if(true){
-        if (data == null || daysBetween > 7) {
+        if (data == null || daysBetween > 14) {
 
             switch (exchange) {
                 case BSE_EXCHANGE:
