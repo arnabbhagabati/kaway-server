@@ -29,7 +29,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.URL;
 import java.util.Scanner;
 
-import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
+import static com.kaway.main.KawayConstants.*;
 
 @Service
 public class BSEService {
@@ -147,6 +147,7 @@ public class BSEService {
                                                     security.getName()+" ALL",
                                             security.getDisplayName()+" Constituents",SecType.INDEX_ALL);
                     allSec.setConstituents(constituents);
+                    allSec.setExchange(BSE_EXCHANGE);
                     secList.add(allSec);
                 }
             }

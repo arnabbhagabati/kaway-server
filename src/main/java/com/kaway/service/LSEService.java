@@ -21,6 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.kaway.main.KawayConstants.BSE_EXCHANGE;
+import static com.kaway.main.KawayConstants.LSE_EXCHANGE;
+
 @Service
 public class LSEService {
 
@@ -126,6 +129,7 @@ public class LSEService {
         Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
         List<String> consList = new ArrayList<String>();
         consList.addAll(constituents);
+        allSec.setExchange(LSE_EXCHANGE);
         allSec.setConstituents(consList);
 
         //System.out.println(op);

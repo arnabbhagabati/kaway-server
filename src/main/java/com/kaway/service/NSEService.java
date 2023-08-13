@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
+import static com.kaway.main.KawayConstants.*;
 
 @Service
 public class NSEService {
@@ -111,6 +111,7 @@ public class NSEService {
                 Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
                 System.out.println("NSEService addAllIndices secId "+secId+" constituents.size() "+constituents.size());
                 allSec.setConstituents(constituents);
+                allSec.setExchange(NSE_EXCHANGE);
                 allSecs.add(allSec);
             }
         }

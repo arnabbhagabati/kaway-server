@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
+import static com.kaway.main.KawayConstants.NASDAQ_EXCHANGE;
 
 @Component
 public class NasdaqService {
@@ -264,6 +265,7 @@ public class NasdaqService {
 
                 }
                 Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
+                allSec.setExchange(NASDAQ_EXCHANGE);
                 allSec.setConstituents(constituents);
                 allSecs.add(allSec);
             }
