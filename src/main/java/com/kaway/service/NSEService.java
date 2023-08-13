@@ -88,11 +88,15 @@ public class NSEService {
 
     private List<Security> addAllIndices(List<Security> secs) throws FileNotFoundException {
 
+        System.out.println("NSEService addAllIndices start");
         List<Security> allSecs = new ArrayList<>();
         for(Security sec : secs){
             String secId = sec.getId();
+            System.out.println("NSEService addAllIndices secId "+secId);
             File f = new File("src/main/resources/"+secId+".csv");
+            System.out.println("NSEService addAllIndices secId "+secId+" f.exists() "+f.exists());
             if(GET_INDEX_CONSTITUENTS && f.exists() && !f.isDirectory()) {
+                System.out.println("NSEService addAllIndices secId "+secId+" found "+f.getName());
                 List<List<String>> constituentSecs = fileUtil.getCsvRecords(f);
                 List<String> constituents = new ArrayList<>();
                 int cnt = 0;
@@ -105,6 +109,7 @@ public class NSEService {
 
                 }
                 Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
+                System.out.println("NSEService addAllIndices secId "+secId+" constituents.size() "+constituents.size());
                 allSec.setConstituents(constituents);
                 allSecs.add(allSec);
             }
