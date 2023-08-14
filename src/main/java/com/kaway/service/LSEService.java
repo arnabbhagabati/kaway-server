@@ -115,7 +115,7 @@ public class LSEService {
 
                 for (int i = 0; i < dataArray.size(); i++) {
                     JsonObject data = dataArray.get(i).getAsJsonObject();
-                    constituents.add(data.get("tidm").getAsString());
+                    constituents.add(data.get("tidm").getAsString().replace(".",""));
                 }
 
             } catch (Exception e) {

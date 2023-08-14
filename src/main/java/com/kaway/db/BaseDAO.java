@@ -57,7 +57,11 @@ public class BaseDAO {
         // asynchronously retrieve the document
         ApiFuture<DocumentSnapshot> future = docRef.get();
         // block on response
+
+        System.out.println("Getting data from future for exchange "+exchange);
         DocumentSnapshot document = future.get();
+
+        System.out.println("Retrieved data from future for exchange "+exchange);
 
         if (document.exists()) {
             return document.getData();
