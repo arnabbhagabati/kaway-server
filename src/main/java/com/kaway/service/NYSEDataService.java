@@ -64,7 +64,7 @@ public class NYSEDataService {
         JsonArray data = new JsonParser().parse(response).getAsJsonArray();
         for(JsonElement stock : data){
             JsonObject currData = (JsonObject)stock;
-            Security security = new Security(currData.get("symbolTicker").getAsString(), currData.get("exchangeId").getAsString(), currData.get("instrumentName").getAsString(), currData.get("symbolTicker").getAsString(), SecType.STOCK);
+            Security security = new Security(currData.get("symbolTicker").getAsString(), currData.get("symbolTicker").getAsString(), currData.get("instrumentName").getAsString(), currData.get("symbolTicker").getAsString(), SecType.STOCK);
             secList.add(security);
         }
 
