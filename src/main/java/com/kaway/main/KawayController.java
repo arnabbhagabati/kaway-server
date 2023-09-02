@@ -49,7 +49,7 @@ class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyE
   }
 }
 
-@CrossOrigin(origins = {"https://bullcharts.org","http://localhost:3000","https://kaway-n3ahptldka-as.a.run.app","http://localhost:8080"})
+@CrossOrigin(origins = {"https://bullcharts.org","https://kaway-og2rb3iodq-as.a.run.app","http://localhost:3000"})
 @RestController
 class KawayController {
 
@@ -100,27 +100,27 @@ class KawayController {
   }
 
   @PostMapping("/users/{userEmail}/dashboard")
-  public String addDashboard(@PathVariable(value="userEmail") String email,
+  public String addDashboard(@RequestHeader(value="User-Token") String userToken,
+                            @PathVariable(value="userEmail") String email,
                             @RequestBody Dashboard dashboard,
-                            @RequestParam(name = "uid") String uid,
-                            @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException {
+                            @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException {
     //System.out.println(dashboard);
     return dashboardActions.saveDashBoard(dashboard,userToken,uid,email);
   }
 
   @DeleteMapping("/users/{userEmail}/{dashboard}")
-  public String deleteDashboard(@PathVariable(value="userEmail") String email,
+  public String deleteDashboard(@RequestHeader(value="User-Token") String userToken,
+                            @PathVariable(value="userEmail") String email,
                            @PathVariable (name = "dashboard") String dashboardName,
-                           @RequestParam(name = "uid") String uid,
-                           @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+                           @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
     return dashboardActions.deleteDashboard(userToken,uid,email,dashboardName);
   }
 
 
   @GetMapping("/users/{userEmail}/dashboards")
-  public List<Dashboard> getDashboards(@PathVariable(value="userEmail") String email,
-                                       @RequestParam(name = "uid") String uid,
-                                       @RequestParam(name = "userToken") String userToken) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+  public List<Dashboard> getDashboards(@RequestHeader(value="User-Token") String userToken,
+                                       @PathVariable(value="userEmail") String email,
+                                       @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
     return dashboardActions.getDashboards(userToken,uid,email);
   }
 

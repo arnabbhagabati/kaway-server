@@ -29,12 +29,12 @@ public class MboumDataService {
     HTTPClient client;
 
     private static String NSE_HIST_DATA_BASE = "https://mboum.com/api/v1/hi/history/?symbol=";
-    private static int GAP_BETWEEN_CALLS = 2000;
+    private static int GAP_BETWEEN_CALLS = 200;
     private static AtomicLong LAST_CALL_TIME = new AtomicLong(System.currentTimeMillis());
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     //Todo : move this to more secure loc
-    private static String API_KEY = "YpChip3KKgvcSmkSCqPRHquVfuH5qdBQzZb5aldJGogr3CGQfFP10UVkWOx2";
+    private static String API_KEY = "wSjfzb0vmWagVh2TbQKmWvJypyT4Qr7O1zhkaUiDm16EMGZxz7BynDsUlRsl";
 
     public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode, String type) throws InterruptedException {
 

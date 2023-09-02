@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
+import static com.kaway.main.KawayConstants.NASDAQ_EXCHANGE;
 
 @Component
 public class NasdaqService {
@@ -181,7 +182,7 @@ public class NasdaqService {
         return op;
     }*/
 
-    public List<Security> getSecList() throws IOException {
+    public List<Security> getSecList() throws IOException, InterruptedException {
         List<Security> secList = new ArrayList<>();
         //String url = "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true";
 
@@ -214,14 +215,72 @@ public class NasdaqService {
             Security security = new Security(currData.get("symbol").getAsString(), currData.get("symbol").getAsString(), currData.get("name").getAsString().replaceFirst(" Common Stock",""), currData.get("symbol").getAsString(), SecType.STOCK);
             secList.add(security);
         }
-        //secList.addAll(getIndicesList(secMap));
+        secList.addAll(getNasdaQIndicesList());
         return secList;
 
     }
 
+    private List<Security> getNasdaQIndicesList() throws FileNotFoundException {
+        List<Security> list = new ArrayList<>();
+        list.add(new Security("^IXIC","COMP","NASDAQ Composite","Composite", SecType.INDEX));
+        list.add(new Security("^NDX","NDX","Nasdaq 100","100", SecType.INDEX));
+        list.add(new Security("^NQGI","NQGI","Nasdaq Global Equity Index","Global Equity Index", SecType.INDEX));
+
+        list.add(new Security("^ABAQ","ABAQ","ABA Community Bank NASDAQ Index","Community Bank NASDAQ Index", SecType.INDEX));
+        list.add(new Security("^BXN","BXN","CBOE NASDAQ-100 BuyWrite Index","CBOE NASDAQ-100 BuyWrite Index", SecType.INDEX));
+        list.add(new Security("^TRAN","TRAN","Dow Transportation","Dow Transportation", SecType.INDEX));
 
 
-    public List<Security> getIndicesList() throws IOException, InterruptedException {
+        /*list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));
+        list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));
+
+        list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));
+        list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));
+        list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));
+        list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));
+        list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));*/
+
+        addAllIndices(list);
+
+        return list;
+    }
+
+
+    private List<Security> addAllIndices(List<Security> secs) throws FileNotFoundException {
+
+        List<Security> allSecs = new ArrayList<>();
+        for(Security sec : secs){
+            String secId = sec.getId();
+            File f = new File("src/main/resources/"+secId+".csv");
+            if(GET_INDEX_CONSTITUENTS && f.exists() && !f.isDirectory()) {
+                List<List<String>> constituentSecs = fileUtil.getCsvRecords(f);
+                List<String> constituents = new ArrayList<>();
+                int cnt = 0;
+                for(List<String> consSec : constituentSecs){
+                    if(cnt==0){
+                        cnt++;
+                    }else{
+                        constituents.add(consSec.get(0));
+                    }
+
+                }
+                Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
+                allSec.setExchange(NASDAQ_EXCHANGE);
+                allSec.setConstituents(constituents);
+                allSecs.add(allSec);
+            }
+        }
+
+        secs.addAll(allSecs);
+        return secs;
+    }
+
+
+    /* Result is too huge
+        Maybe add as a separate exchange like Nasdaq Indices later?
+        check https://indexes.nasdaqomx.com/index/directory
+     */
+    private List<Security> getIndicesList(String region,String exchange) throws IOException, InterruptedException {
         List<Security> secList = new ArrayList<>();
         int offset = 0;
         int retrievedCnt = 0;
@@ -236,7 +295,7 @@ public class NasdaqService {
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("https://query1.finance.yahoo.com/v1/finance/screener?crumb=qi1yBvvC.cQ&lang=en-US&region=US&formatted=true&corsDomain=finance.yahoo.com"))
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"size\":100,\"offset\":"+offset+",\"sortField\":\"percentchange\",\"sortType\":\"DESC\",\"quoteType\":\"INDEX\",\"topOperator\":\"AND\",\"query\":{\"operator\":\"AND\",\"operands\":[{\"operator\":\"or\",\"operands\":[{\"operator\":\"EQ\",\"operands\":[\"region\",\"us\"]}]}]},\"userId\":\"SNODVZAKC7RFBBWPKMCNCAHT5I\",\"userIdType\":\"guid\"}"))
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"size\":100,\"offset\":"+offset+",\"sortField\":\"percentchange\",\"sortType\":\"DESC\",\"quoteType\":\"INDEX\",\"topOperator\":\"AND\",\"query\":{\"operator\":\"AND\",\"operands\":[{\"operator\":\"or\",\"operands\":[{\"operator\":\"EQ\",\"operands\":[\"region\",\""+region+"\"]}]},{\"operator\":\"or\",\"operands\":[{\"operator\":\"EQ\",\"operands\":[\"exchange\",\""+exchange+"\"]}]}]},\"userId\":\"SNODVZAKC7RFBBWPKMCNCAHT5I\",\"userIdType\":\"guid\"}"))
                         .setHeader("accept", "*/*")
                         .setHeader("accept-language", "en-US,en;q=0.9")
                         .setHeader("cache-control", "no-cache")
@@ -261,23 +320,37 @@ public class NasdaqService {
                 for (int i = 0; i < dataArray.size(); i++) {
                     JsonObject data = dataArray.get(i).getAsJsonObject();
                     JsonObject idx = new JsonObject();
+
+
+                    //JsonObject regularMarketVolume = data.get("regularMarketVolume").getAsJsonObject();
                     idx.addProperty("fullExchangeName",data.get("fullExchangeName").getAsString());
                     idx.addProperty("symbol",data.get("symbol").getAsString());
                     idx.addProperty("exchange",data.get("exchange").getAsString());
                     idx.addProperty("shortName",data.get("shortName").getAsString());
 
+                    if(data.has("regularMarketVolume")){
+                        JsonObject regularMarketVolume = data.get("regularMarketVolume").getAsJsonObject();
+                        idx.add("regularMarketVolume",regularMarketVolume);
+                    }
+
+                    //idx.addProperty("regularMarketVolume",regularMarketVolume);
+
                     op.add(idx);
+
+                    Security sec = new Security(data.get("symbol").getAsString(),data.get("symbol").getAsString(),data.get("shortName").getAsString(),data.get("shortName").getAsString(),SecType.INDEX);
+                    secList.add(sec);
 
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
+                System.out.println("Errrneous result is for "+"{\"size\":100,\"offset\":"+offset+",\"sortField\":\"percentchange\",\"sortType\":\"DESC\",\"quoteType\":\"INDEX\",\"topOperator\":\"AND\",\"query\":{\"operator\":\"AND\",\"operands\":[{\"operator\":\"or\",\"operands\":[{\"operator\":\"EQ\",\"operands\":[\"region\",\""+region+"\"]}]},{\"operator\":\"or\",\"operands\":[{\"operator\":\"EQ\",\"operands\":[\"exchange\",\""+exchange+"\"]}]}]},\"userId\":\"SNODVZAKC7RFBBWPKMCNCAHT5I\",\"userIdType\":\"guid\"}");
             }
             retrievedCnt =retrievedCnt+100;
             offset = offset+100;
 
         }
-        System.out.println(op);
+        //System.out.println(op);
         return secList;
     }
 

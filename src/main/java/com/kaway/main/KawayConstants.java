@@ -2,7 +2,7 @@ package com.kaway.main;
 
 public class KawayConstants {
 
-    public static String PROJECT_ID = "silly-tomato-386917";
+    public static String PROJECT_ID = "kaway-395713";
     public static final String BSE_EXCHANGE = "BSE";
     public static final String NSE_EXCHANGE = "NSE";
     public static final String NASDAQ_EXCHANGE = "NASDAQ";

@@ -45,9 +45,9 @@ public class NSEDataService {
 
         String url =NSE_HIST_DATA_BASE+stockCode;
         if(type.equals(SecType.INDEX.toString())){
-            url = url+"?formatted=true&interval=1d&range=2y";
+            url = url+"?formatted=true&interval=1d&range=5y";
         }else{
-            url =url+".NS?formatted=true&interval=1d&range=2y";
+            url =url+".NS?formatted=true&interval=1d&range=5y";
         }
 
         String rawdata = client.getHTTPData(url);

@@ -29,7 +29,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.URL;
 import java.util.Scanner;
 
-import static com.kaway.main.KawayConstants.GET_INDEX_CONSTITUENTS;
+import static com.kaway.main.KawayConstants.*;
 
 @Service
 public class BSEService {
@@ -64,9 +64,23 @@ public class BSEService {
         Map<String,Security> secMap = new HashMap<>();
         List<Security> secList = new ArrayList<>();
         String url = "https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=&status=Active";
-        String rawdata = client.getHTTPData(url);
+        HttpClient client = HttpClient.newHttpClient();
 
-        JsonArray rawJson = new JsonParser().parse(rawdata).getAsJsonArray();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=&status=Active"))
+                .GET()
+                .setHeader("accept", "application/json, text/plain, */*")
+                .setHeader("accept-language", "en-US,en;q=0.9")
+                .setHeader("cache-control", "no-cache")
+                .setHeader("origin", "https://www.bseindia.com")
+                .setHeader("pragma", "no-cache")
+                .setHeader("referer", "https://www.bseindia.com/")
+                .setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        JsonArray rawJson = new JsonParser().parse(response.body()).getAsJsonArray();
 
         for(JsonElement data : rawJson){
             JsonObject currData = (JsonObject)data;
@@ -125,14 +139,15 @@ public class BSEService {
                     List<List<String>> constituentSecs = fileUtil.getCsvRecords(f);
                     List<String> constituents = new ArrayList<>();
                     for(List<String> consSec : constituentSecs){
-                        if(consSec.get(0).startsWith("Scrip")) continue;
-                        if(secMap.containsKey(consSec.get(0))) constituents.add(secMap.get(consSec.get(0)).getCode());
+                        if(consSec.get(0).startsWith("Ticker")) continue;
+                        if(secMap.containsKey(consSec.get(0))) constituents.add(secMap.get(consSec.get(0)).getId());
                     }
                     Security allSec = new Security(security.getCode()+"_ALL",
                                                     security.getCode()+"_ALL",
                                                     security.getName()+" ALL",
                                             security.getDisplayName()+" Constituents",SecType.INDEX_ALL);
                     allSec.setConstituents(constituents);
+                    allSec.setExchange(BSE_EXCHANGE);
                     secList.add(allSec);
                 }
             }

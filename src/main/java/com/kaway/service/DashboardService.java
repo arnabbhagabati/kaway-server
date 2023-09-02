@@ -39,7 +39,7 @@ public class DashboardService {
                     existingDashboardMap.put(dashboard.getName(),dashboard);
                     baseDao.saveDashboard(userId, email, existingDashboardMap);
             }else{
-                return retMessage;
+                return validationMsg;
             }
 
         }catch(ExecutionException | IOException | InterruptedException e){
