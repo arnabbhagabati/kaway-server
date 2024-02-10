@@ -1,8 +1,10 @@
 package com.kaway.actions;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
 import com.kaway.db.BaseDAO;
+import com.kaway.db.LocalBaseDao;
 import com.kaway.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,7 +26,7 @@ import static com.kaway.main.KawayConstants.*;
 public class ExchangeActions {
 
     @Autowired
-    BaseDAO baseDao;
+    LocalBaseDao baseDao;
 
     @Autowired
     NasdaqService nasdaqService;
@@ -47,7 +49,7 @@ public class ExchangeActions {
     @Autowired
     LSEService lseService;
 
-    public Map<String,List<DataPoint>> getSecDataFromDb(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+    public Map<String,List<DataPoint>> getSecDataFromDb(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
         Map<String,List<DataPoint>> dataMap = new HashMap<>();
         Map<String, Object> dailyData = baseDao.getDailySecData(exchange,secId+"_"+ONE_DAY);
         Map<String, Object> fifData = baseDao.getDailySecData(exchange,secId+"_"+FIFTEEN_MIN);
@@ -107,7 +109,7 @@ public class ExchangeActions {
         return fifteenMinData;
     }
 
-    public  Map<String,List<DataPoint>> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException {
+    public  Map<String,List<DataPoint>> getExchangeData(String exchange,String secId,String type) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
         Map<String,List<DataPoint>> dbData = getSecDataFromDb(exchange, secId, type);
         Map<String,List<DataPoint>> retData = new HashMap<>();
         String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
@@ -143,7 +145,7 @@ public class ExchangeActions {
     }
 
     @Cacheable(value = "secListCache")
-    public List<Security> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException {
+    public List<Security> getSecList(String exchange) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
 
         List<Security> op = new ArrayList<>();
 
@@ -153,7 +155,7 @@ public class ExchangeActions {
 
         Map<String, Object> data = baseDao.getSecList(exchange);
 
-        if(data != null) {
+        if(data != null && !data.isEmpty()) {
 
             Map.Entry<String, Object> firstEntry = data.entrySet().iterator().next();
             dataDate = firstEntry.getKey();
@@ -167,7 +169,7 @@ public class ExchangeActions {
         }
 
         //if(true){
-        if (data == null || daysBetween > 14) {
+        if (data == null || data.isEmpty() || daysBetween > 14) {
 
             switch (exchange) {
                 case BSE_EXCHANGE:

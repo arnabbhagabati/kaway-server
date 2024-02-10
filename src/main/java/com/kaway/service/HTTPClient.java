@@ -16,7 +16,7 @@ import java.net.URLEncoder;
 @Component
 public class HTTPClient {
 
-    private static String MBM_API_KEY = "wSjfzb0vmWagVh2TbQKmWvJypyT4Qr7O1zhkaUiDm16EMGZxz7BynDsUlRsl";
+    private static String MBM_API_KEY = "3EtKF9E54u4mqrA77wmfOX2LOR7wLnpEmONNpLrPpjGGh8JqW1OaUQOiRDn7";
 
     public String getHTTPData(String endpoint){
         StringBuilder op = new StringBuilder();

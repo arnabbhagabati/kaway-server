@@ -8,6 +8,7 @@ import com.kaway.beans.Dashboard;
 import com.kaway.beans.Dashboards;
 import com.kaway.beans.Security;
 import com.kaway.db.BaseDAO;
+import com.kaway.db.LocalBaseDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ import static com.kaway.main.KawayConstants.SUCCESS;
 public class DashboardService {
 
     @Autowired
-    BaseDAO baseDao;
+    LocalBaseDao baseDao;
 
     public String saveDashBoard(Dashboard dashboard,String userId,String email) {
         String retMessage = "Dashboard saved successfully";

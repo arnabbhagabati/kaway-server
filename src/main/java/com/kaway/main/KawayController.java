@@ -1,6 +1,7 @@
 package com.kaway.main;
 
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.kaway.actions.DashboardActions;
 import com.kaway.actions.ExchangeActions;
@@ -68,7 +69,7 @@ class KawayController {
   }
 
   @GetMapping("/histData/{exchange}/{secId}")
-  Map<String,List<DataPoint>> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type,@RequestParam(name = "type") String days) throws IOException, ExecutionException, InterruptedException {
+  Map<String,List<DataPoint>> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type,@RequestParam(name = "type") String days) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
     //NasdaqService service = new NasdaqService();
     System.out.println("exchange="+exchange+" secId="+secId+" type ="+type);
     Map<String,List<DataPoint>> data  = exchangeActions.getExchangeData(exchange,secId,type);
@@ -76,13 +77,13 @@ class KawayController {
   }
 
   @GetMapping("/secList/{exchange}")
-  List<Security> getSecData(@PathVariable(value="exchange") String exchange) throws IOException, ExecutionException, InterruptedException {
+  List<Security> getSecData(@PathVariable(value="exchange") String exchange) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
     List<Security> data  = exchangeActions.getSecList(exchange);
     return data;
   }
 
   @GetMapping("/loadData/{exchange}")
-  String loadData(@PathVariable(value="exchange") String exchange,@RequestParam(name = "idxCode") String idxCode) throws IOException, ExecutionException, InterruptedException {
+  String loadData(@PathVariable(value="exchange") String exchange,@RequestParam(name = "idxCode") String idxCode) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
     //nasdaqService.getIndicesList();
     Object secListData  = (Object) exchangeActions.getSecList(exchange);
     List<HashMap<String,Object>> secData = (List<HashMap<String,Object>>) secListData;
