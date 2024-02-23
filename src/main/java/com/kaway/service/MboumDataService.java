@@ -44,7 +44,7 @@ public class MboumDataService {
         System.out.println("Calling  "+NSE_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
         Map<String,List<DataPoint>> opMap = new HashMap<>();
-        String url =NSE_HIST_DATA_BASE+stockCode;
+        String url =NSE_HIST_DATA_BASE+getASCIIStockCode(stockCode);
         switch(exchngCode){
             case "NSE":
                 if(type.equals(SecType.INDEX.toString())){
@@ -110,7 +110,7 @@ public class MboumDataService {
         System.out.println("Calling  "+NSE_HIST_DATA_BASE+" for "+stockCode+" at "+LAST_CALL_TIME );
 
         Map<String,List<DataPoint>> opMap = new HashMap<>();
-        String url =NSE_HIST_DATA_BASE+stockCode;
+        String url =NSE_HIST_DATA_BASE+getASCIIStockCode(stockCode);
         switch(exchngCode){
             case "NSE":
                 if(type.equals(SecType.INDEX.toString())){
@@ -204,5 +204,9 @@ public class MboumDataService {
         }
 
         return freshData;
+    }
+
+    private String getASCIIStockCode(String stock){
+        return stock.replace("&","%26");
     }
 }

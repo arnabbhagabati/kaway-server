@@ -22,7 +22,7 @@ import static com.kaway.main.KawayConstants.*;
 @Service
 public class BaseDAO {
 
-    @Autowired
+    /*@Autowired
     FireStoreConfig fireStoreConfig;
 
     public void setDailySecData(String exchange, String secId, Map<String,List<DataPoint>> data) throws IOException, ExecutionException, InterruptedException {
@@ -109,5 +109,5 @@ public class BaseDAO {
 
         System.out.println("Update time : " + writeResult.get());
 
-    }
+    }*/
 }

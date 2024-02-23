@@ -17,7 +17,7 @@ import java.io.IOException;
 @Component
 public class FireStoreConfig {
 
-    @Bean
+    /*@Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public FireStoreContainer dbContainer() throws IOException {
         return new FireStoreContainer();
@@ -34,10 +34,7 @@ public class FireStoreConfig {
                             .build();
             db = firestoreOptions.getService();
 
-            // Option 2: Initialize a Firestore client with default values inferred from
-            //           your environment.
-            //db = FirestoreOptions.getDefaultInstance().getService();
         }
-    }
+    }*/
 
 }

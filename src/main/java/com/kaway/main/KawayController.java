@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.xml.bind.ValidationException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

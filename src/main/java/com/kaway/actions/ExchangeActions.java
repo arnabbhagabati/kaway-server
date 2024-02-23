@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -169,7 +170,7 @@ public class ExchangeActions {
         }
 
         //if(true){
-        if (data == null || data.isEmpty() || daysBetween > 14) {
+        if (data == null || data.isEmpty() || daysBetween > 5) {
 
             switch (exchange) {
                 case BSE_EXCHANGE:

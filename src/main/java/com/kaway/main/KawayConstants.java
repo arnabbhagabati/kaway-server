@@ -19,6 +19,7 @@ public class KawayConstants {
 
     public static final String USER_COLLECTION ="USERS";
     public static final String SUCCESS ="SUCCESS";
+    public static final String FAILURE ="FAILURE";
     public static final String DASHBORADS ="dashboards";
 
 }

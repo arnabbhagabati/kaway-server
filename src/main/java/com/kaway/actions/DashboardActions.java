@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.kaway.main.KawayConstants.SUCCESS;
+import static com.kaway.main.KawayConstants.FAILURE;
 
 @Service
 public class DashboardActions {
@@ -64,7 +65,7 @@ public class DashboardActions {
     }
 
     private String validateUser(String userToken, String userId) throws IOException {
-        String uid = "";
+        /*String uid = "";
         try {
             fireBaseConfig.getMyFirebaseApp().getFirebaseApp();
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(userToken);
@@ -75,8 +76,8 @@ public class DashboardActions {
         }
         if(!uid.equals(userId)){
             return "User could not be validated";
-        }
+        }*/
 
-        return SUCCESS;
+        return FAILURE;
     }
 }

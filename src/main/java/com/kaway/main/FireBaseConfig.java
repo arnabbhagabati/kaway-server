@@ -19,7 +19,7 @@ import java.io.IOException;
 @Configuration
 public class FireBaseConfig {
 
-    @Bean
+   /* @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public MyFireBaseApp getMyFirebaseApp() throws IOException {
         return new MyFireBaseApp();
@@ -40,5 +40,5 @@ public class FireBaseConfig {
             return this.firebaseApp;
         }
 
-    }
+    }*/
 }
