@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-@Component
+/*@Component
 @Order(0)
 class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyEvent> {
   private final boolean appcds;
@@ -49,7 +49,7 @@ class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyE
       SpringApplication.exit(ctx, () -> 0);
     }
   }
-}
+}*/
 
 @CrossOrigin(origins = {"https://bullcharts.org","https://kaway-og2rb3iodq-as.a.run.app","http://localhost:3000"})
 @RestController

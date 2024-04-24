@@ -169,8 +169,8 @@ public class ExchangeActions {
             op = (List<Security>) data.get(dataDate);
         }
 
-        //if(true){
-        if (data == null || data.isEmpty() || daysBetween > 5) {
+        if(true){
+        //if (data == null || data.isEmpty() || daysBetween > 5) {
 
             switch (exchange) {
                 case BSE_EXCHANGE:
