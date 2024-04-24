@@ -29,27 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-/*@Component
-@Order(0)
-class AppCdsApplicationListener implements ApplicationListener<ApplicationReadyEvent> {
-  private final boolean appcds;
-  private final ApplicationContext ctx;
-  private final RestTemplate restTemplate = new RestTemplate();
-
-  AppCdsApplicationListener(@Value("${appcds:false}") boolean appcds,
-      ApplicationContext ctx) {
-    this.appcds = appcds;
-    this.ctx = ctx;
-  }
-
-  @Override
-  public void onApplicationEvent(ApplicationReadyEvent event) {
-    if (appcds) {
-      restTemplate.getForEntity("http://localhost:8080/", String.class);
-      SpringApplication.exit(ctx, () -> 0);
-    }
-  }
-}*/
 
 @CrossOrigin(origins = {"https://bullcharts.org","https://kaway-og2rb3iodq-as.a.run.app","http://localhost:3000"})
 @RestController
@@ -85,7 +64,6 @@ class KawayController {
 
   @GetMapping("/loadData/{exchange}")
   String loadData(@PathVariable(value="exchange") String exchange,@RequestParam(name = "idxCode") String idxCode) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
-    //nasdaqService.getIndicesList();
     Object secListData  = (Object) exchangeActions.getSecList(exchange);
     List<HashMap<String,Object>> secData = (List<HashMap<String,Object>>) secListData;
     for(HashMap<String,Object> secMap : secData){

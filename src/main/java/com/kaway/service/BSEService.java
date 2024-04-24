@@ -63,11 +63,12 @@ public class BSEService {
     public List<Security> getSecList() throws IOException, InterruptedException {
         Map<String,Security> secMap = new HashMap<>();
         List<Security> secList = new ArrayList<>();
-        String url = "https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=&status=Active";
+        String correct_url = "https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=&status=Active";
+        String tmp_url = "https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=Equity&status=Active"; // since correct url is not working atm
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=&status=Active"))
+                .uri(URI.create(tmp_url))
                 .GET()
                 .setHeader("accept", "application/json, text/plain, */*")
                 .setHeader("accept-language", "en-US,en;q=0.9")
