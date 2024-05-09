@@ -3,10 +3,7 @@ package com.kaway.db;
 import com.couchbase.lite.*;
 
 import com.couchbase.lite.Collection;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.kaway.beans.Dashboard;
 import com.kaway.beans.DataPoint;
 import com.kaway.beans.SecType;
@@ -26,6 +23,10 @@ public class LocalBaseDao {
     Database database;
     private static String SEC_PRICE_DATA = "priceData";
     private static String SEC_DATA = "secData";
+    private static String SEC_LIST = "SecList";
+
+    private static String USER_DATA = "userData";
+    public static String USER_DASHBOARDS = "userDashboards";
 
     public LocalBaseDao() {
         CouchbaseLite.init();
@@ -108,7 +109,7 @@ public class LocalBaseDao {
         Document document = database.getCollection(exchange).getDocument(SEC_DATA);
         if (document != null) {
             System.out.println("Document ID :: " + document.getId());
-            String jsonStr = document.getString("SecList");
+            String jsonStr = document.getString(SEC_LIST);
             jsonData = new JsonParser().parse(jsonStr).getAsJsonObject();
         }
 
@@ -157,19 +158,65 @@ public class LocalBaseDao {
             jsonData.add(e.getKey(),array);
         }
 
-        MutableDocument secDoc = new MutableDocument(SEC_DATA).setString("SecList",jsonData.toString());
+        MutableDocument secDoc = new MutableDocument(SEC_DATA).setString(SEC_LIST,jsonData.toString());
         collection.save(secDoc);
     }
 
 
-    public Map<String, Object> getUserDashboards(String uid, String email) throws IOException, ExecutionException, InterruptedException {
-        String key=email+"_"+uid;
+    public Map<String, Dashboard> getUserDashboards(String uid, String email) throws CouchbaseLiteException {
+        Collection collection = database.getCollection(USER_DATA);
+        Map<String, Dashboard> op = new HashMap<>();
+        String userDataKey=email+"_"+uid;
+
+        if(collection == null){
+            return  null;
+        }
+
+        JsonObject jsonData = null;
+        Document document = database.getCollection(USER_DATA).getDocument(userDataKey);
+        if (document != null) {
+            System.out.println("Document ID :: " + document.getId());
+            String jsonStr = document.getString(USER_DASHBOARDS);
+            jsonData = new JsonParser().parse(jsonStr).getAsJsonObject();
+        }
+
+        if(jsonData != null) {
+            for (Map.Entry<String, JsonElement> entry : jsonData.entrySet()) {
+                JsonObject dashboardJson = (JsonObject) entry.getValue();
+                List<Security> secList = new ArrayList<>();
+                for(JsonElement je  : dashboardJson.get("securityList").getAsJsonArray()){
+                    JsonObject secObj = je.getAsJsonObject();
+                    Gson gson = new Gson();
+                    Security sec= gson.fromJson(secObj.toString(), Security.class);
+                    secList.add(sec);
+                }
+                Dashboard dashBoard = new Dashboard(dashboardJson.get("name").getAsString(),secList);
+                op.put(dashBoard.getName(),dashBoard);
+
+            }
+            return op;
+        }
         return null;
     }
 
-    public void saveDashboard(String uid, String email, Map<String, Dashboard> data) throws IOException{
-        // Add a new document (asynchronously) in collection "cities" with id "LA"
-        String key=email+"_"+uid;
+    public void saveDashboard(String uid, String email, Map<String, Dashboard> data) throws IOException, CouchbaseLiteException {
+
+        String userDataKey=email+"_"+uid;
+        Collection collection = database.getCollection(USER_DATA);
+
+        if (collection == null) {
+            collection = database.createCollection(USER_DATA);
+        }
+
+        JsonObject jsonData = new JsonObject();
+
+        for (Map.Entry<String, Dashboard> e : data.entrySet()) {
+            JsonObject dashBrdJsn = new JsonParser().parse(new Gson().toJson(e.getValue())).getAsJsonObject();
+            jsonData.add(e.getKey(),dashBrdJsn);
+        }
+
+        MutableDocument secDoc = new MutableDocument(userDataKey).setString(USER_DASHBOARDS,jsonData.toString());
+        collection.save(secDoc);
     }
 
     public void deleteDashboard(String uid, String email, String dashboard) throws IOException, ExecutionException, InterruptedException {
