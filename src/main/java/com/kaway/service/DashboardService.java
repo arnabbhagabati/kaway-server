@@ -1,5 +1,6 @@
 package com.kaway.service;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -43,7 +44,7 @@ public class DashboardService {
                 return validationMsg;
             }
 
-        }catch(ExecutionException | IOException | InterruptedException e){
+        }catch(ExecutionException | IOException | InterruptedException | CouchbaseLiteException e){
             e.printStackTrace();
             retMessage = "An error ocurred saving your dashboard";
         }
@@ -55,21 +56,21 @@ public class DashboardService {
         baseDao.deleteDashboard(userId,email,dashboardName);
     }
 
-    public Map<String,Dashboard> getDashboards(String userId,String email) throws IOException, ExecutionException, InterruptedException {
+    public Map<String,Dashboard> getDashboards(String userId,String email) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
         Map<String,Dashboard> op = new HashMap<>();
-        Map<String,Object> dashboardsMap = baseDao.getUserDashboards(userId,email);
-        List<Dashboard> dashboardList =  new ArrayList<>();
+        Map<String,Dashboard> dashboardsMap = baseDao.getUserDashboards(userId,email);
+        /*List<Dashboard> dashboardList =  new ArrayList<>();
         if(dashboardsMap != null && !dashboardsMap.isEmpty()){
             //List<Map<String,Object>> listofDbMaps = (List<Map<String,Object>>) dashboardsMap.get(DASHBORADS);
-            for(Map.Entry<String,Object> e: dashboardsMap.entrySet()){
+            for(Map.Entry<String,Dashboard> e: dashboardsMap.entrySet()){
                 String name = (String) e.getKey();
-                Map<String,Object> map = (Map<String,Object>) e.getValue();
-                List<Security> secList = (List<Security>) map.get("securityList");
-                Dashboard db = new Dashboard(name,secList);
+                //Map<String,Object> map = (Map<String,Object>) e.getValue();
+                Dashboard db = e.getValue();
                 op.put(name,db);
             }
         }
-        return op;
+        return op;*/
+        return dashboardsMap;
     }
 
 

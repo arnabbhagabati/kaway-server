@@ -100,7 +100,7 @@ class KawayController {
   @GetMapping("/users/{userEmail}/dashboards")
   public List<Dashboard> getDashboards(@RequestHeader(value="User-Token") String userToken,
                                        @PathVariable(value="userEmail") String email,
-                                       @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+                                       @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException, CouchbaseLiteException {
     return dashboardActions.getDashboards(userToken,uid,email);
   }
 

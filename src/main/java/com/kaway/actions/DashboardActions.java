@@ -1,13 +1,10 @@
 package com.kaway.actions;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.kaway.beans.Dashboard;
 import com.kaway.db.FireStoreConfig;
 import com.kaway.main.FireBaseConfig;
-import com.kaway.main.KawayConstants;
 import com.kaway.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,8 +33,9 @@ public class DashboardActions {
     FireStoreConfig fireStoreConfig;
 
     public String saveDashBoard(Dashboard dashboard, String userToken, String userId, String email) throws FirebaseAuthException, ValidationException, IOException {
-        String valMsg = validateUser(userToken,userId);
-        if(valMsg.equals(SUCCESS)) {
+        String valMsg = validateUserLocal(userToken,userId);
+        //if(valMsg.equals(SUCCESS)) {
+        if(true) {
             return dashboardService.saveDashBoard(dashboard, userId, email);
         }else{
             return valMsg;
@@ -45,8 +43,8 @@ public class DashboardActions {
     }
 
 
-    public List<Dashboard> getDashboards(String userToken,String userId,String email) throws IOException, ExecutionException, InterruptedException {
-        String valMsg = validateUser(userToken,userId);
+    public List<Dashboard> getDashboards(String userToken,String userId,String email) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
+        String valMsg = validateUserLocal(userToken,userId);
         List<Dashboard> dashboards = new ArrayList<>();
         if(valMsg.equals(SUCCESS)) {
             Map<String,Dashboard>  dashboardsMap =  dashboardService.getDashboards(userId, email);
@@ -56,7 +54,7 @@ public class DashboardActions {
     }
 
     public String deleteDashboard(String userToken,String userId,String email,String dashboardName) throws IOException, ExecutionException, InterruptedException {
-        String valMsg = validateUser(userToken,userId);
+        String valMsg = validateUserLocal(userToken,userId);
         if(valMsg.equals(SUCCESS)) {
             dashboardService.deleteDashboard(userId, email, dashboardName);
             return SUCCESS;
@@ -64,7 +62,7 @@ public class DashboardActions {
         return valMsg;
     }
 
-    private String validateUser(String userToken, String userId) throws IOException {
+    private String validateUserFireBase(String userToken, String userId) throws IOException {
         /*String uid = "";
         try {
             fireBaseConfig.getMyFirebaseApp().getFirebaseApp();
@@ -79,5 +77,10 @@ public class DashboardActions {
         }*/
 
         return FAILURE;
+    }
+
+
+    private String validateUserLocal(String userToken, String userId) throws IOException {
+        return SUCCESS;
     }
 }
