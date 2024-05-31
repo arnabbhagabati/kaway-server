@@ -32,3 +32,6 @@ build/
 
 ### Downloaded ###
 unZipDir/
+
+*secDb.cblite2/*
+src/main/resources/secDb.cblite2/*

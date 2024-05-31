@@ -38,7 +38,7 @@ public class LSEService {
         List<Security> secList = new ArrayList<>();
         String url = "https://eodhistoricaldata.com/api/exchange-symbol-list/LSE?fmt=json&api_token=" + EOD_Hist_Data_API_KEY;
 
-        String rawdata = client.getHTTPData(url);
+        String rawdata = client.getHTTPData(url,null);
 
         JsonArray arrData = new JsonParser().parse(rawdata).getAsJsonArray();
         for (JsonElement stock : arrData) {

@@ -16,9 +16,7 @@ import java.net.URLEncoder;
 @Component
 public class HTTPClient {
 
-    private static String MBM_API_KEY = "Lv8fKPUSoolKZbkvclLnEdLIsqSMj1uIMNo5F6yMcvSkQDm2fV4qzZW1egl6";
-
-    public String getHTTPData(String endpoint){
+    public String getHTTPData(String endpoint,String api){
         StringBuilder op = new StringBuilder();
         System.out.println("HTTP call with URL "+endpoint+ " at "+System.currentTimeMillis());
 
@@ -46,7 +44,7 @@ public class HTTPClient {
             //conn.setRequestProperty("Accept-Encoding","gzip,deflate,br");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");  // Note - yahho fin api does not work with utf 8
             //conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
-            conn.setRequestProperty("X-Mboum-Secret",MBM_API_KEY);
+            if(api!=null) conn.setRequestProperty("X-Mboum-Secret",api);
 
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
