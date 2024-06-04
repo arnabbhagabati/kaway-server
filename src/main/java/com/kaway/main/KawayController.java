@@ -1,6 +1,5 @@
 package com.kaway.main;
 
-
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.kaway.actions.DashboardActions;
@@ -9,21 +8,13 @@ import com.kaway.beans.Dashboard;
 import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
-import com.kaway.service.NasdaqService;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.xml.bind.ValidationException;
 import java.io.IOException;
-import java.net.URISyntaxException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +29,6 @@ class KawayController {
   ExchangeActions exchangeActions;
 
   @Autowired
-  NasdaqService nasdaqService; // tmp
-
-  @Autowired
   DashboardActions dashboardActions;
 
   @GetMapping("/")
@@ -50,7 +38,7 @@ class KawayController {
 
   @GetMapping("/histData/{exchange}/{secId}")
   Map<String,List<DataPoint>> getDefaultData(@PathVariable(value="exchange") String exchange, @PathVariable(value="secId") String secId, @RequestParam(name = "type") String type,@RequestParam(name = "type") String days) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
-    //NasdaqService service = new NasdaqService();
+
     System.out.println("exchange="+exchange+" secId="+secId+" type ="+type);
     Map<String,List<DataPoint>> data  = exchangeActions.getExchangeData(exchange,secId,type);
     return data;
@@ -84,7 +72,7 @@ class KawayController {
                             @PathVariable(value="userEmail") String email,
                             @RequestBody Dashboard dashboard,
                             @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException {
-    //System.out.println(dashboard);
+
     return dashboardActions.saveDashBoard(dashboard,userToken,uid,email);
   }
 
