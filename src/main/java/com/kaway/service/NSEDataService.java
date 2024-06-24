@@ -50,7 +50,7 @@ public class NSEDataService {
             url =url+".NS?formatted=true&interval=1d&range=5y";
         }
 
-        String rawdata = client.getHTTPData(url);
+        String rawdata = client.getHTTPData(url,null);
         List<DataPoint> op = new ArrayList<>();
         Gson g = new Gson();
 

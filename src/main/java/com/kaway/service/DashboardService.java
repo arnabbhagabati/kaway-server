@@ -1,36 +1,26 @@
 package com.kaway.service;
 
 import com.couchbase.lite.CouchbaseLiteException;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.kaway.beans.Dashboard;
-import com.kaway.beans.Dashboards;
-import com.kaway.beans.Security;
 import com.kaway.db.BaseDAO;
 import com.kaway.db.LocalBaseDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.ValidationException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.kaway.main.KawayConstants.DASHBORADS;
 import static com.kaway.main.KawayConstants.SUCCESS;
 
 @Service
 public class DashboardService {
 
     @Autowired
-    LocalBaseDao baseDao;
+    BaseDAO baseDao;
 
-    public String saveDashBoard(Dashboard dashboard,String userId,String email) {
+    public String saveDashBoard(Dashboard dashboard,String userId,String email) throws Exception {
         String retMessage = "Dashboard saved successfully";
 
         try {
@@ -52,25 +42,15 @@ public class DashboardService {
         return retMessage;
     }
 
-    public void deleteDashboard(String userId,String email,String dashboardName) throws IOException, ExecutionException, InterruptedException {
+    public void deleteDashboard(String userId,String email,String dashboardName) throws Exception {
         baseDao.deleteDashboard(userId,email,dashboardName);
     }
 
-    public Map<String,Dashboard> getDashboards(String userId,String email) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
-        Map<String,Dashboard> op = new HashMap<>();
+    public Map<String,Dashboard> getDashboards(String userId,String email) throws Exception {
+
         Map<String,Dashboard> dashboardsMap = baseDao.getUserDashboards(userId,email);
-        /*List<Dashboard> dashboardList =  new ArrayList<>();
-        if(dashboardsMap != null && !dashboardsMap.isEmpty()){
-            //List<Map<String,Object>> listofDbMaps = (List<Map<String,Object>>) dashboardsMap.get(DASHBORADS);
-            for(Map.Entry<String,Dashboard> e: dashboardsMap.entrySet()){
-                String name = (String) e.getKey();
-                //Map<String,Object> map = (Map<String,Object>) e.getValue();
-                Dashboard db = e.getValue();
-                op.put(name,db);
-            }
-        }
-        return op;*/
         return dashboardsMap;
+
     }
 
 

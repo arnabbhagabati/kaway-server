@@ -69,7 +69,7 @@ public class NasdaqService {
                 break;
         }*/
 
-        String rawdata = client.getHTTPData(url);
+        String rawdata = client.getHTTPData(url,null);
 
         List<DataPoint> op = new ArrayList<>();
 

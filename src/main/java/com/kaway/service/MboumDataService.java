@@ -33,6 +33,8 @@ public class MboumDataService {
     private static AtomicLong LAST_CALL_TIME = new AtomicLong(System.currentTimeMillis());
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
+    private static String api1 = "Lv8fKPUSoolKZbkvclLnEdLIsqSM";
+
     public synchronized List<DataPoint> getHistData(String exchngCode, String stockCode, String type) throws InterruptedException {
 
         System.out.println("LAST call time is "+LAST_CALL_TIME);
@@ -69,7 +71,8 @@ public class MboumDataService {
         }
 
         String url1 = url+"&interval=1d&diffandsplits=true";
-        String rawdata1d = client.getHTTPData(url1);
+        String api2 = "j1uIMNo5F6yMcvSkQDm2fV4qzZW1egl6";
+        String rawdata1d = client.getHTTPData(url1,api1+api2);
 
         List<DataPoint> op = new ArrayList<>();
         JsonObject json1d = new JsonParser().parse(rawdata1d).getAsJsonObject().getAsJsonObject("data");
@@ -136,7 +139,8 @@ public class MboumDataService {
 
 
         String url2 = url+"&interval=15m&diffandsplits=true";
-        String rawdata15m = client.getHTTPData(url2);
+        String api2 = "j1uIMNo5F6yMcvSkQDm2fV4qzZW1egl6";
+        String rawdata15m = client.getHTTPData(url2,api1+api2);
 
         List<DataPoint> op = new ArrayList<>();
         JsonObject json15m = new JsonParser().parse(rawdata15m).getAsJsonObject().getAsJsonObject("data");

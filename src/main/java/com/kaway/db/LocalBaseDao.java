@@ -8,17 +8,16 @@ import com.kaway.beans.Dashboard;
 import com.kaway.beans.DataPoint;
 import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-import static com.kaway.main.KawayConstants.SEC_LIST;
-import static com.kaway.main.KawayConstants.USER_COLLECTION;
-
 @Service
-public class LocalBaseDao {
+@Primary
+public class LocalBaseDao implements BaseDAO{
 
     Database database;
     private static String SEC_PRICE_DATA = "priceData";
@@ -169,7 +168,7 @@ public class LocalBaseDao {
         String userDataKey=email+"_"+uid;
 
         if(collection == null){
-            return  null;
+            return op ;
         }
 
         JsonObject jsonData = null;
@@ -192,11 +191,9 @@ public class LocalBaseDao {
                 }
                 Dashboard dashBoard = new Dashboard(dashboardJson.get("name").getAsString(),secList);
                 op.put(dashBoard.getName(),dashBoard);
-
             }
-            return op;
         }
-        return null;
+        return op;
     }
 
     public void saveDashboard(String uid, String email, Map<String, Dashboard> data) throws IOException, CouchbaseLiteException {
