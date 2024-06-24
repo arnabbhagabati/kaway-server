@@ -17,7 +17,7 @@ import java.io.IOException;
 @Component
 public class FireStoreConfig {
 
-    /*@Bean
+    @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public FireStoreContainer dbContainer() throws IOException {
         return new FireStoreContainer();
@@ -35,6 +35,6 @@ public class FireStoreConfig {
             db = firestoreOptions.getService();
 
         }
-    }*/
+    }
 
 }

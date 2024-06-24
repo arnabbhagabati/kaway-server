@@ -1,7 +1,9 @@
 package com.kaway.actions;
 
 import com.couchbase.lite.CouchbaseLiteException;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.kaway.beans.Dashboard;
 import com.kaway.db.FireStoreConfig;
 import com.kaway.main.FireBaseConfig;
@@ -32,7 +34,7 @@ public class DashboardActions {
     @Autowired
     FireStoreConfig fireStoreConfig;
 
-    public String saveDashBoard(Dashboard dashboard, String userToken, String userId, String email) throws FirebaseAuthException, ValidationException, IOException {
+    public String saveDashBoard(Dashboard dashboard, String userToken, String userId, String email) throws Exception {
         String valMsg = validateUserLocal(userToken,userId);
         //if(valMsg.equals(SUCCESS)) {
         if(true) {
@@ -43,7 +45,7 @@ public class DashboardActions {
     }
 
 
-    public List<Dashboard> getDashboards(String userToken,String userId,String email) throws IOException, ExecutionException, InterruptedException, CouchbaseLiteException {
+    public List<Dashboard> getDashboards(String userToken,String userId,String email) throws Exception {
         String valMsg = validateUserLocal(userToken,userId);
         List<Dashboard> dashboards = new ArrayList<>();
         if(valMsg.equals(SUCCESS)) {
@@ -53,7 +55,7 @@ public class DashboardActions {
         return dashboards;
     }
 
-    public String deleteDashboard(String userToken,String userId,String email,String dashboardName) throws IOException, ExecutionException, InterruptedException {
+    public String deleteDashboard(String userToken,String userId,String email,String dashboardName) throws Exception {
         String valMsg = validateUserLocal(userToken,userId);
         if(valMsg.equals(SUCCESS)) {
             dashboardService.deleteDashboard(userId, email, dashboardName);
@@ -63,7 +65,7 @@ public class DashboardActions {
     }
 
     private String validateUserFireBase(String userToken, String userId) throws IOException {
-        /*String uid = "";
+        String uid = "";
         try {
             fireBaseConfig.getMyFirebaseApp().getFirebaseApp();
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(userToken);
@@ -74,7 +76,7 @@ public class DashboardActions {
         }
         if(!uid.equals(userId)){
             return "User could not be validated";
-        }*/
+        }
 
         return FAILURE;
     }

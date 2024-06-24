@@ -3,7 +3,6 @@ package com.kaway.actions;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.kaway.beans.Security;
 import com.kaway.beans.DataPoint;
-import com.kaway.db.BaseDAO;
 import com.kaway.db.LocalBaseDao;
 import com.kaway.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,15 +10,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import static com.kaway.main.KawayConstants.*;
 

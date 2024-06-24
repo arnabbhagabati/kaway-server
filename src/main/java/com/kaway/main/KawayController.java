@@ -71,7 +71,7 @@ class KawayController {
   public String addDashboard(@RequestHeader(value="User-Token") String userToken,
                             @PathVariable(value="userEmail") String email,
                             @RequestBody Dashboard dashboard,
-                            @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException {
+                            @RequestParam(name = "uid") String uid) throws Exception {
 
     return dashboardActions.saveDashBoard(dashboard,userToken,uid,email);
   }
@@ -80,7 +80,7 @@ class KawayController {
   public String deleteDashboard(@RequestHeader(value="User-Token") String userToken,
                             @PathVariable(value="userEmail") String email,
                            @PathVariable (name = "dashboard") String dashboardName,
-                           @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException {
+                           @RequestParam(name = "uid") String uid) throws Exception {
     return dashboardActions.deleteDashboard(userToken,uid,email,dashboardName);
   }
 
@@ -88,7 +88,7 @@ class KawayController {
   @GetMapping("/users/{userEmail}/dashboards")
   public List<Dashboard> getDashboards(@RequestHeader(value="User-Token") String userToken,
                                        @PathVariable(value="userEmail") String email,
-                                       @RequestParam(name = "uid") String uid) throws ValidationException, IOException, FirebaseAuthException, ExecutionException, InterruptedException, CouchbaseLiteException {
+                                       @RequestParam(name = "uid") String uid) throws Exception {
     return dashboardActions.getDashboards(userToken,uid,email);
   }
 
