@@ -32,6 +32,7 @@ public class LSEService {
     HTTPClient client;
 
     private String EOD_Hist_Data_API_KEY = "64aaa015a80121.74386960";
+    private static String EXCHANGE = "LSE";
 
     public List<Security> getSecList() throws IOException {
 
@@ -43,7 +44,7 @@ public class LSEService {
         JsonArray arrData = new JsonParser().parse(rawdata).getAsJsonArray();
         for (JsonElement stock : arrData) {
             JsonObject currData = (JsonObject) stock;
-            Security security = new Security(currData.get("Code").getAsString(), currData.get("Name").getAsString(), currData.get("Name").getAsString(), currData.get("Code").getAsString(), SecType.STOCK);
+            Security security = new Security(EXCHANGE,currData.get("Code").getAsString(), currData.get("Name").getAsString(), currData.get("Name").getAsString(), currData.get("Code").getAsString(), SecType.STOCK);
             secList.add(security);
         }
 
@@ -57,18 +58,18 @@ public class LSEService {
 
         List<Security> list = new ArrayList<>();
         List<Security> allSecList = new ArrayList<>();
-        list.add(new Security("^FTSE","^FTSE","ftse-100","FTSE 100", SecType.INDEX));
-        list.add(new Security("^IXIC","COMP","ftse-aim-uk-50-index","FTSE AIM UK 50 Index", SecType.INDEX));
-        list.add(new Security("^NDX","NDX","ftse-aim-100-index","FTSE AIM 100 Index", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^FTSE","^FTSE","ftse-100","FTSE 100", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^IXIC","COMP","ftse-aim-uk-50-index","FTSE AIM UK 50 Index", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^NDX","NDX","ftse-aim-100-index","FTSE AIM 100 Index", SecType.INDEX));
 
         for(Security sec : list){
             allSecList.add(getConstituents(sec.getName(),sec));
         }
 
-        list.add(new Security("^NDX","NDX","FTSE 250","FTSE 250", SecType.INDEX));
-        list.add(new Security("^IXIC","COMP","FTSE 350","FTSE 350", SecType.INDEX));
-        list.add(new Security("^NDX","NDX","FTSE All-Share","FTSE All-Share", SecType.INDEX));
-        list.add(new Security("^IXIC","COMP","FTSE AIM All-Share","FTSE AIM All-Share", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^NDX","NDX","FTSE 250","FTSE 250", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^IXIC","COMP","FTSE 350","FTSE 350", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^NDX","NDX","FTSE All-Share","FTSE All-Share", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^IXIC","COMP","FTSE AIM All-Share","FTSE AIM All-Share", SecType.INDEX));
         //list.add(new Security("^NDX","NDX","Nasdaq 100","100", SecType.INDEX));
 
         list.addAll(allSecList);
@@ -126,7 +127,7 @@ public class LSEService {
             pageNo = pageNo+1;
 
         }
-        Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
+        Security allSec = new Security(EXCHANGE,sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
         List<String> consList = new ArrayList<String>();
         consList.addAll(constituents);
         allSec.setExchange(LSE_EXCHANGE);

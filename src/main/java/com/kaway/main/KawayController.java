@@ -4,6 +4,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.kaway.actions.DashboardActions;
 import com.kaway.actions.ExchangeActions;
+import com.kaway.actions.FilterActions;
 import com.kaway.beans.Dashboard;
 import com.kaway.beans.SecType;
 import com.kaway.beans.Security;
@@ -30,6 +31,9 @@ class KawayController {
 
   @Autowired
   DashboardActions dashboardActions;
+
+  @Autowired
+  FilterActions filterActions;
 
   @GetMapping("/")
   String hello() {
@@ -90,6 +94,16 @@ class KawayController {
                                        @PathVariable(value="userEmail") String email,
                                        @RequestParam(name = "uid") String uid) throws Exception {
     return dashboardActions.getDashboards(userToken,uid,email);
+  }
+
+
+  @PostMapping("/filter")
+  public List<Security> filterSecurities( @RequestParam(name = "filterType") String filterType,
+                              @RequestBody List<Security> securityList) throws Exception {
+
+    System.out.println("filterType is "+filterType);
+    System.out.println("secList is "+securityList);
+    return filterActions.getStableSecs(securityList);
   }
 
 }

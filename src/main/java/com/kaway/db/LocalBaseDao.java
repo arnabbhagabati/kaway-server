@@ -23,6 +23,7 @@ public class LocalBaseDao implements BaseDAO{
     private static String SEC_PRICE_DATA = "priceData";
     private static String SEC_DATA = "secData";
     private static String SEC_LIST = "SecList";
+    private static String SEC_DATAPOINTS = "SecDataPoints";
 
     private static String USER_DATA = "userData";
     public static String USER_DASHBOARDS = "userDashboards";
@@ -55,7 +56,7 @@ public class LocalBaseDao implements BaseDAO{
                 jsonData.add(e.getKey(),array);
             }
 
-            MutableDocument secDoc = new MutableDocument(SEC_PRICE_DATA).setString(secId,jsonData.toString());
+            MutableDocument secDoc = new MutableDocument(secId).setString(SEC_DATAPOINTS,jsonData.toString());
             collection.save(secDoc);
 
     }
@@ -63,12 +64,15 @@ public class LocalBaseDao implements BaseDAO{
 
     public Map<String, Object> getDailySecData(String exchange, String secId) throws CouchbaseLiteException {
         Collection collection = database.getCollection(exchange);
+
         JsonObject jsonData = null;
         Map<String, Object> op = new HashMap<>();
 
-        Document document = database.getCollection(exchange).getDocument(SEC_PRICE_DATA);
+        if(collection == null) return op;
+
+        Document document = collection.getDocument(secId);
         if (document != null) {
-            String jsonStr = document.getString(secId);
+            String jsonStr = document.getString(SEC_DATAPOINTS);
             if(jsonStr != null && !jsonStr.isEmpty()){
                 jsonData = new JsonParser().parse(jsonStr).getAsJsonObject();
             }
@@ -124,7 +128,7 @@ public class LocalBaseDao implements BaseDAO{
                         String cons = je.getAsString();
                         constituents.add(cons);
                     }
-                    Security sec = new Security(
+                    Security sec = new Security(exchange,
                             dpJsonObject.get("id").getAsString(),
                             dpJsonObject.get("code").getAsString(),
                             dpJsonObject.get("name").getAsString(),

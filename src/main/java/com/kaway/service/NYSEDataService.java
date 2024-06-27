@@ -27,6 +27,8 @@ public class NYSEDataService {
     @Autowired
     FileUtil fileUtil;
 
+    private static String EXCHANGE = "NYSE";
+
     public List<Security> getSecList() throws IOException {
 
         List<Security> secList = new ArrayList<>();
@@ -64,7 +66,7 @@ public class NYSEDataService {
         JsonArray data = new JsonParser().parse(response).getAsJsonArray();
         for(JsonElement stock : data){
             JsonObject currData = (JsonObject)stock;
-            Security security = new Security(currData.get("symbolTicker").getAsString(), currData.get("symbolTicker").getAsString(), currData.get("instrumentName").getAsString(), currData.get("symbolTicker").getAsString(), SecType.STOCK);
+            Security security = new Security(EXCHANGE,currData.get("symbolTicker").getAsString(), currData.get("symbolTicker").getAsString(), currData.get("instrumentName").getAsString(), currData.get("symbolTicker").getAsString(), SecType.STOCK);
             secList.add(security);
         }
 
@@ -100,7 +102,7 @@ public class NYSEDataService {
             int cnt =0;
             for(List<String> consSec : constituentSecs){
                 if(cnt>0) {
-                    Security sec = new Security("^" + consSec.get(0), "^" + consSec.get(0), consSec.get(1), consSec.get(1).replaceFirst("NYSE ",""), SecType.INDEX);
+                    Security sec = new Security(EXCHANGE,"^" + consSec.get(0), "^" + consSec.get(0), consSec.get(1), consSec.get(1).replaceFirst("NYSE ",""), SecType.INDEX);
                     list.add(sec);
                 }
                 cnt++;

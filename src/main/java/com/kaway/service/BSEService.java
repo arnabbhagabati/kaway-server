@@ -40,6 +40,8 @@ public class BSEService {
     @Autowired
     FileUtil fileUtil;
 
+    private static String EXCHANGE = "BSE";
+
     /*public Map<String,Security> getSecMap(){
         Map<String,Security> secMap = new HashMap<>();
         String url = "https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=&status=Active";
@@ -87,7 +89,7 @@ public class BSEService {
             JsonObject currData = (JsonObject)data;
             if((currData.get("Segment").getAsString().equals("Equity") /*|| currData.get("Segment").getAsString().equals("MF")*/)
                     &&(currData.get("Mktcap") != null && !currData.get("Mktcap").getAsString().isEmpty()) ) {
-                Security security = new Security(currData.get("scrip_id").getAsString(), currData.get("SCRIP_CD").getAsString(), currData.get("Scrip_Name").getAsString(), currData.get("scrip_id").getAsString(), SecType.STOCK);
+                Security security = new Security(EXCHANGE,currData.get("scrip_id").getAsString(), currData.get("SCRIP_CD").getAsString(), currData.get("Scrip_Name").getAsString(), currData.get("scrip_id").getAsString(), SecType.STOCK);
                 secList.add(security);
                 secMap.put(security.getCode(), security);
             }
@@ -128,7 +130,7 @@ public class BSEService {
 
             for(int i=0;i<dataArray.size();i++){
                 JsonObject data = dataArray.get(i).getAsJsonObject();
-                Security security = new Security( data.get("symbol").getAsString(),
+                Security security = new Security( EXCHANGE,data.get("symbol").getAsString(),
                                                     data.get("symbol").getAsString(),
                                                     data.get("shortName").getAsString(),
                                                     getFormattedIndexName(data.get("shortName").getAsString()),
@@ -143,7 +145,7 @@ public class BSEService {
                         if(consSec.get(0).startsWith("Ticker")) continue;
                         if(secMap.containsKey(consSec.get(0))) constituents.add(secMap.get(consSec.get(0)).getId());
                     }
-                    Security allSec = new Security(security.getCode()+"_ALL",
+                    Security allSec = new Security(EXCHANGE,security.getCode()+"_ALL",
                                                     security.getCode()+"_ALL",
                                                     security.getName()+" ALL",
                                             security.getDisplayName()+" Constituents",SecType.INDEX_ALL);

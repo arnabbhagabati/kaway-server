@@ -41,6 +41,8 @@ public class NasdaqService {
     @Autowired
     BSEService bseService;
 
+    private static String EXCHANGE = "NASDAQ";
+
     private static String NASDAQ_HIST_DATA_BASE = "https://data.nasdaq.com/api/v3/datasets";
     private static int GAP_BETWEEN_CALLS = 5000;
     private static AtomicLong LAST_CALL_TIME = new AtomicLong(System.currentTimeMillis());
@@ -212,7 +214,7 @@ public class NasdaqService {
         JsonArray rawJson = new JsonParser().parse(rawdata).getAsJsonObject().getAsJsonObject("data").getAsJsonArray("rows");
         for(JsonElement data : rawJson){
             JsonObject currData = (JsonObject)data;
-            Security security = new Security(currData.get("symbol").getAsString(), currData.get("symbol").getAsString(), currData.get("name").getAsString().replaceFirst(" Common Stock",""), currData.get("symbol").getAsString(), SecType.STOCK);
+            Security security = new Security(EXCHANGE,currData.get("symbol").getAsString(), currData.get("symbol").getAsString(), currData.get("name").getAsString().replaceFirst(" Common Stock",""), currData.get("symbol").getAsString(), SecType.STOCK);
             secList.add(security);
         }
         secList.addAll(getNasdaQIndicesList());
@@ -222,13 +224,13 @@ public class NasdaqService {
 
     private List<Security> getNasdaQIndicesList() throws FileNotFoundException {
         List<Security> list = new ArrayList<>();
-        list.add(new Security("^IXIC","COMP","NASDAQ Composite","Composite", SecType.INDEX));
-        list.add(new Security("^NDX","NDX","Nasdaq 100","100", SecType.INDEX));
-        list.add(new Security("^NQGI","NQGI","Nasdaq Global Equity Index","Global Equity Index", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^IXIC","COMP","NASDAQ Composite","Composite", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^NDX","NDX","Nasdaq 100","100", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^NQGI","NQGI","Nasdaq Global Equity Index","Global Equity Index", SecType.INDEX));
 
-        list.add(new Security("^ABAQ","ABAQ","ABA Community Bank NASDAQ Index","Community Bank NASDAQ Index", SecType.INDEX));
-        list.add(new Security("^BXN","BXN","CBOE NASDAQ-100 BuyWrite Index","CBOE NASDAQ-100 BuyWrite Index", SecType.INDEX));
-        list.add(new Security("^TRAN","TRAN","Dow Transportation","Dow Transportation", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^ABAQ","ABAQ","ABA Community Bank NASDAQ Index","Community Bank NASDAQ Index", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^BXN","BXN","CBOE NASDAQ-100 BuyWrite Index","CBOE NASDAQ-100 BuyWrite Index", SecType.INDEX));
+        list.add(new Security(EXCHANGE,"^TRAN","TRAN","Dow Transportation","Dow Transportation", SecType.INDEX));
 
 
         /*list.add(new Security("^NQGI","NQGI","NQGI","Nasdaq Global Equity Index", SecType.INDEX));
@@ -264,7 +266,7 @@ public class NasdaqService {
                     }
 
                 }
-                Security allSec = new Security(sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
+                Security allSec = new Security(EXCHANGE,sec.getCode()+"_ALL", sec.getId()+"_ALL", sec.getName()+" ALL",sec.getDisplayName()+" Constituents", SecType.INDEX_ALL);
                 allSec.setExchange(NASDAQ_EXCHANGE);
                 allSec.setConstituents(constituents);
                 allSecs.add(allSec);
@@ -337,7 +339,7 @@ public class NasdaqService {
 
                     op.add(idx);
 
-                    Security sec = new Security(data.get("symbol").getAsString(),data.get("symbol").getAsString(),data.get("shortName").getAsString(),data.get("shortName").getAsString(),SecType.INDEX);
+                    Security sec = new Security(EXCHANGE,data.get("symbol").getAsString(),data.get("symbol").getAsString(),data.get("shortName").getAsString(),data.get("shortName").getAsString(),SecType.INDEX);
                     secList.add(sec);
 
                 }
