@@ -22,7 +22,7 @@ public class FilterActions {
     @Autowired
     LocalBaseDao baseDao;
 
-    public List<Security> getStableSecs(List<Security> allSecs) throws CouchbaseLiteException {
+    public List<Security> getStableSecs(List<Security> allSecs,Integer volPercent) throws CouchbaseLiteException {
         List<Security> op = new ArrayList<>();
         for(Security sec: allSecs){
             String today = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date());
@@ -49,7 +49,7 @@ public class FilterActions {
                 }else{
                     Long diff = Math.abs(prevAvg-avg);
                     Double diffPercent = ((Double) ((double)diff)/avg) *100;
-                    if(diffPercent > 25){
+                    if(diffPercent > volPercent){
                         stable = false;
                         break;
                     }
@@ -59,7 +59,7 @@ public class FilterActions {
             if(stable) {
                 Long absoluteDiff = Math.abs(averages.get(0) - averages.get(averages.size() - 1));
                 Double diffPercent = ((Double) ((double) absoluteDiff) / averages.get(0)) * 100;
-                if (diffPercent > 25) {
+                if (diffPercent > volPercent) {
                     stable = false;
                 }
             }

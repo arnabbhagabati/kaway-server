@@ -99,11 +99,12 @@ class KawayController {
 
   @PostMapping("/filter")
   public List<Security> filterSecurities( @RequestParam(name = "filterType") String filterType,
+                                          @RequestParam(name = "volPercent") Integer volPercent,
                               @RequestBody List<Security> securityList) throws Exception {
 
-    System.out.println("filterType is "+filterType);
+    System.out.println("volPercent is "+volPercent);
     System.out.println("secList is "+securityList);
-    return filterActions.getStableSecs(securityList);
+    return filterActions.getStableSecs(securityList,volPercent);
   }
 
 }
